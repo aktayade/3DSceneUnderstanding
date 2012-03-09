@@ -8,6 +8,9 @@ for ii = 1:length(office)
         dput = dput + 1;
         data(dput, :) = office(ii,:);
         data(dput, 3) = indx;
+        if data(dput,3) == length(office_mapping)
+            data(dput,3) = 0;
+        end
     end
 end
 

@@ -8,6 +8,9 @@ for ii = 1:length(home)
         dput = dput + 1;
         data(dput, :) = home(ii,:);
         data(dput, 3) = home_mapping(indx, 2);
+        if data(dput,3) == max(home_mapping(:,2))
+            data(dput,3) = 0;
+        end
     end
 end
 
