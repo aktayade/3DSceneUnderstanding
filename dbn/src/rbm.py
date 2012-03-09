@@ -315,7 +315,11 @@ def test_rbm(learning_rate=0.1, training_epochs = 15,
     :param n_samples: number of samples to plot for each chain
 
     """
-    datasets = load_data(dataset)
+    #datasets = load_data(dataset)
+    # Loading Cornell data instead of the MNIST data
+    # Note the feature vector size was changed from 784 (28*28) into 52 in all places
+    datasets = load_cornell_data()
+
 
     train_set_x, train_set_y = datasets[0]
     test_set_x , test_set_y  = datasets[2]

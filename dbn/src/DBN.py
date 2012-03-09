@@ -12,7 +12,7 @@ from logistic_sgd import LogisticRegression, load_data
 from mlp import HiddenLayer
 from rbm import RBM
 
-# UMICH Stuff
+# Cornell data stuff
 from convert_data import *
 
 class DBN(object):
@@ -29,7 +29,7 @@ class DBN(object):
 #    def __init__(self, numpy_rng, theano_rng = None, n_ins = 784, 
 #                 hidden_layers_sizes = [500,500], n_outs = 10):
     def __init__(self, numpy_rng, theano_rng = None, n_ins = 52, 
-                 hidden_layers_sizes = [500,500], n_outs = 10):
+                 hidden_layers_sizes = [30,30], n_outs = 10):
         """This class is made to support a variable number of layers. 
 
         :type numpy_rng: numpy.random.RandomState
@@ -54,7 +54,8 @@ class DBN(object):
         self.sigmoid_layers = []
         self.rbm_layers     = []
         self.params         = []
-        self.n_layers       = len(hidden_layers_sizes)
+#        self.n_layers       = len(hidden_layers_sizes)
+        self.n_layers       = 1
 
         assert self.n_layers > 0
 
@@ -385,6 +386,7 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
                  (best_validation_loss * 100., test_score*100.))
     print >> sys.stderr, ('The fine tuning code for file '+os.path.split(__file__)[1]+' ran for %.2fm' % ((end_time-start_time)/60.))
 
+    print type(dbn.sigmoid_layers[-1].output[0][0])
 
 
 if __name__ == '__main__':
