@@ -1,0 +1,27 @@
+from string import *
+from numpy import *
+import numpy, time, cPickle, gzip, sys, os
+
+datf = open('rematfiles/data_split5_train.txt')
+lines = datf.readlines()
+
+# Loop through each line and perform operations
+OddLine = True
+FeatureMat = []
+LabelVec = []
+for x in lines:
+    words = x.split()
+    if OddLine == True:
+       Features = []
+       for y in words:
+       	   Features = append(Features, float32(atof(y)))
+FeatureMat = vstack((FeatureMat, Features))
+else:
+		Labels = []
+		for y in words:
+		    Labels = append(Labels, int64(atoi(y)))
+		LabelVec = vstack((LabelVec, Labels))
+	OddLine = not(OddLine)
+FinalTupTrain = (FeatureMat, LabelVec)
+
+
