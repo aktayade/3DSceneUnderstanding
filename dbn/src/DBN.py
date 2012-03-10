@@ -258,6 +258,10 @@ class DBN(object):
         
         index   = T.lscalar('index')
 
+<<<<<<< HEAD
+        get_fn = theano.function(inputs = [index],
+              outputs = self.sigmoid_layers[-1].output,
+=======
         get_fn = theano.function(inputs = [index], 
               outputs = self.sigmoid_layers[-1].output, 
               #outputs = self.params,
@@ -267,17 +271,40 @@ class DBN(object):
                 
         label_fn = theano.function(inputs = [index], 
               outputs = self.y, 
+>>>>>>> 67f9c76b69b66bf86ca0ab8d6dfcc389eedd1ae3
+              #outputs = self.params,
+              #outputs = self.x,
+              givens  = {
+                #self.x : train_set_x[2:3],
+                #self.y : train_set_y[2:3]})
+                self.x : train_set_x[index:index+1],
+                self.y : train_set_y[index:index+1]})
+
+        label_fn = theano.function(inputs = [index], 
+              outputs = self.y,
               #outputs = self.params,
               givens  = {
                 self.x : train_set_x[index:index+1],
                 self.y : train_set_y[index:index+1]})
         
+<<<<<<< HEAD
+        return get_fn, label_fn
+    ##########################################################################
+
+
+#def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
+#              pretrain_lr = 0.01, k = 1, training_epochs = 1000, \
+#              dataset='../data/mnist.pkl.gz', batch_size = 20):
+def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
+              pretrain_lr = 0.5, k = 1, training_epochs = 1000, \
+=======
         return get_fn,  label_fn
     ##########################################################################
 
 
 def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
               pretrain_lr = 0.01, k = 1, training_epochs = 1000, \
+>>>>>>> 67f9c76b69b66bf86ca0ab8d6dfcc389eedd1ae3
               dataset='../data/mnist.pkl.gz', batch_size = 10):
     """
     Demonstrates how to train and test a Deep Belief Network.
@@ -301,7 +328,7 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
     """
 
 
-    #datasets = load_data(dataset)
+#    datasets = load_data(dataset)
     # Loading Cornell data instead of the MNIST data
     # Note the feature vector size was changed from 784 (28*28) into 52 in all places
     datasets = load_cornell_data()
@@ -309,11 +336,11 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
     train_set_x, train_set_y = datasets[0]
     valid_set_x, valid_set_y = datasets[1]
     test_set_x , test_set_y  = datasets[2]
-    print len(train_set_x.get_value())
+    #print len(train_set_x.get_value())
 
     # compute number of minibatches for training, validation and testing
     n_train_batches = train_set_x.get_value(borrow=True).shape[0] / batch_size
-    print n_train_batches
+    #print n_train_batches
 
     # numpy random generator
     numpy_rng = numpy.random.RandomState(123)
@@ -321,9 +348,17 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
     # construct the Deep Belief Network
 #    dbn = DBN(numpy_rng = numpy_rng, n_ins = 28*28, 
     dbn = DBN(numpy_rng = numpy_rng, n_ins = 52, 
+<<<<<<< HEAD
+#              hidden_layers_sizes = [1000,1000,1000],
+#              n_outs = 10)
+#              hidden_layers_sizes = [5,5,5],
+#              n_outs = 10)
+              hidden_layers_sizes = [30,30,30],
+=======
               #hidden_layers_sizes = [1000,1000,1000],
               #n_outs = 10)
               hidden_layers_sizes = [30,30, 30],
+>>>>>>> 67f9c76b69b66bf86ca0ab8d6dfcc389eedd1ae3
               n_outs = 17)
     
 
@@ -387,12 +422,12 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
 
     while (epoch < training_epochs) and (not done_looping):
       epoch = epoch + 1
-      print n_train_batches
+      #print n_train_batches
       for minibatch_index in xrange(n_train_batches):
 
-        print type(minibatch_index)
-        print minibatch_index
-        minibatch_avg_cost = train_fn(minibatch_index)
+        #print type(minibatch_index)
+        #print minibatch_index
+        #minibatch_avg_cost = train_fn(minibatch_index)
         #my_var = my_fn(minibatch_index)
         #print type(my_var)
         #print len(my_var)
@@ -468,8 +503,17 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
     ##########################
 
     print '... extracting the feature'
+<<<<<<< HEAD
+    get_fn, label_fn = dbn.get_features (datasets = datasets)
+
+    #Output File
+    os.system('touch dbn_features')
+    os.system('cat /dev/null > dbn_features')
+    f = open('dbn_features', 'w')
+=======
     get_fn,  label_fn = dbn.get_features (datasets = datasets)
     #label_fn = dbn.get_features (datasets = datasets)
+>>>>>>> 67f9c76b69b66bf86ca0ab8d6dfcc389eedd1ae3
 
     #Output File
     os.system('touch dbn_features')
@@ -478,19 +522,47 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
     
     #for training_index in xrange(n_train_batches):
     for training_index in range(1, 563):
+<<<<<<< HEAD
+
+    #dbnout = DBN(numpy_rng = numpy_rng, n_ins = 52, 
+    #              hidden_layers_sizes = [30,30,30],
+    #              n_outs = 17)
+
+        features = get_fn(training_index)
+        label = label_fn(training_index)
+        print type(features)
+        #print len(features)
+        print features
+        print label
+
+
         features = get_fn(training_index)
         label = label_fn(training_index)
         #print type(features)
         #print len(features)
         #print label
         print features
+=======
+        features = get_fn(training_index)
+        label = label_fn(training_index)
+        #print type(features)
+        #print len(features)
+        #print label
+        print features
+>>>>>>> 67f9c76b69b66bf86ca0ab8d6dfcc389eedd1ae3
         feature_string = ""
         for i in range(0, len(features[0])):
             x = features[0][i]
             feature_string = feature_string + x.astype('|S999') + ' '
             #print features[0][i-1]
+<<<<<<< HEAD
+        f.write(label.astype('str'))
+	f.write(' ')
+        f.write(feature_string)
+=======
         f.write(feature_string+'\n')
         f.write(label.astype('str'))
+>>>>>>> 67f9c76b69b66bf86ca0ab8d6dfcc389eedd1ae3
         f.write('\n')
     f.close()
 

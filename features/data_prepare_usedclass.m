@@ -1,3 +1,4 @@
+clear all;close all;clc;
 load('mapped_node_features/home.mat');
 
 % Use all 17 classes
@@ -9,6 +10,24 @@ for i = PickClasses
     ClassIndex = find(data(:, 3) == i);
     Features = [Features; data(ClassIndex, 4:end)];
     Labels = [Labels; data(ClassIndex, 3)];
+end
+
+% % Normalizing features by Shift and Scale
+% fprintf('minimum value in Features:  %f\n',min(Features(:)));
+% if min(Features(:)) < 0
+%     Features = Features - min(Features(:));
+% end
+% for INDfeat = 1:size(Features,2)
+%     Features(:,INDfeat) = Features(:,INDfeat)/max(Features(:,INDfeat));
+% end
+
+% Normalizing features by Standard Gaussian
+Features_orig = Features;
+for INDfeat = 1:size(Features,2)
+    mu = mean(Features(:,INDfeat));
+    Features(:,INDfeat) = Features(:,INDfeat) - mu;
+    var_sq = std(Features(:,INDfeat));
+    Features(:,INDfeat) = Features(:,INDfeat)/var_sq;
 end
 
 % Generate training, validation, and test set
