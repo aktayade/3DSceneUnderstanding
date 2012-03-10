@@ -54,8 +54,8 @@ class DBN(object):
         self.sigmoid_layers = []
         self.rbm_layers     = []
         self.params         = []
-#        self.n_layers       = len(hidden_layers_sizes)
-        self.n_layers       = 1
+        self.n_layers       = len(hidden_layers_sizes)
+        #self.n_layers       = 1
 
         assert self.n_layers > 0
 
@@ -259,17 +259,24 @@ class DBN(object):
         index   = T.lscalar('index')
 
         get_fn = theano.function(inputs = [index], 
-              outputs = self.sigmoid_layers[-1].output,
+              outputs = self.sigmoid_layers[-1].output, 
+              #outputs = self.params,
+              givens  = {
+                self.x : train_set_x[index:index+1],
+                self.y : train_set_y[index:index+1]})
+                
+        label_fn = theano.function(inputs = [index], 
+              outputs = self.y, 
               #outputs = self.params,
               givens  = {
                 self.x : train_set_x[index:index+1],
                 self.y : train_set_y[index:index+1]})
         
-        return get_fn
+        return get_fn,  label_fn
     ##########################################################################
 
 
-def test_DBN( finetune_lr = 0.1, pretraining_epochs = 10, \
+def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
               pretrain_lr = 0.01, k = 1, training_epochs = 1000, \
               dataset='../data/mnist.pkl.gz', batch_size = 10):
     """
@@ -316,7 +323,7 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 10, \
     dbn = DBN(numpy_rng = numpy_rng, n_ins = 52, 
               #hidden_layers_sizes = [1000,1000,1000],
               #n_outs = 10)
-              hidden_layers_sizes = [30,30],
+              hidden_layers_sizes = [30,30, 30],
               n_outs = 17)
     
 
@@ -461,16 +468,31 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 10, \
     ##########################
 
     print '... extracting the feature'
-    get_fn = dbn.get_features (datasets = datasets)
+    get_fn,  label_fn = dbn.get_features (datasets = datasets)
+    #label_fn = dbn.get_features (datasets = datasets)
 
+    #Output File
+    os.system('touch dbn_features')
+    os.system('cat /dev/null > dbn_features')
+    f = open('dbn_features', 'w')
+    
     #for training_index in xrange(n_train_batches):
-    for training_index in range(1, 10):
+    for training_index in range(1, 563):
         features = get_fn(training_index)
-        print type(features)
-        print len(features)
+        label = label_fn(training_index)
+        #print type(features)
+        #print len(features)
+        #print label
         print features
-
-
+        feature_string = ""
+        for i in range(0, len(features[0])):
+            x = features[0][i]
+            feature_string = feature_string + x.astype('|S999') + ' '
+            #print features[0][i-1]
+        f.write(feature_string+'\n')
+        f.write(label.astype('str'))
+        f.write('\n')
+    f.close()
 
 if __name__ == '__main__':
     test_DBN()
