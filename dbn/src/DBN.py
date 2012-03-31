@@ -258,20 +258,8 @@ class DBN(object):
         
         index   = T.lscalar('index')
 
-<<<<<<< HEAD
         get_fn = theano.function(inputs = [index],
               outputs = self.sigmoid_layers[-1].output,
-=======
-        get_fn = theano.function(inputs = [index], 
-              outputs = self.sigmoid_layers[-1].output, 
-              #outputs = self.params,
-              givens  = {
-                self.x : train_set_x[index:index+1],
-                self.y : train_set_y[index:index+1]})
-                
-        label_fn = theano.function(inputs = [index], 
-              outputs = self.y, 
->>>>>>> 67f9c76b69b66bf86ca0ab8d6dfcc389eedd1ae3
               #outputs = self.params,
               #outputs = self.x,
               givens  = {
@@ -287,7 +275,6 @@ class DBN(object):
                 self.x : train_set_x[index:index+1],
                 self.y : train_set_y[index:index+1]})
         
-<<<<<<< HEAD
         return get_fn, label_fn
     ##########################################################################
 
@@ -297,14 +284,6 @@ class DBN(object):
 #              dataset='../data/mnist.pkl.gz', batch_size = 20):
 def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
               pretrain_lr = 0.5, k = 1, training_epochs = 1000, \
-=======
-        return get_fn,  label_fn
-    ##########################################################################
-
-
-def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
-              pretrain_lr = 0.01, k = 1, training_epochs = 1000, \
->>>>>>> 67f9c76b69b66bf86ca0ab8d6dfcc389eedd1ae3
               dataset='../data/mnist.pkl.gz', batch_size = 10):
     """
     Demonstrates how to train and test a Deep Belief Network.
@@ -348,17 +327,11 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
     # construct the Deep Belief Network
 #    dbn = DBN(numpy_rng = numpy_rng, n_ins = 28*28, 
     dbn = DBN(numpy_rng = numpy_rng, n_ins = 52, 
-<<<<<<< HEAD
 #              hidden_layers_sizes = [1000,1000,1000],
 #              n_outs = 10)
 #              hidden_layers_sizes = [5,5,5],
 #              n_outs = 10)
               hidden_layers_sizes = [30,30,30],
-=======
-              #hidden_layers_sizes = [1000,1000,1000],
-              #n_outs = 10)
-              hidden_layers_sizes = [30,30, 30],
->>>>>>> 67f9c76b69b66bf86ca0ab8d6dfcc389eedd1ae3
               n_outs = 17)
     
 
@@ -503,17 +476,8 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
     ##########################
 
     print '... extracting the feature'
-<<<<<<< HEAD
-    get_fn, label_fn = dbn.get_features (datasets = datasets)
 
-    #Output File
-    os.system('touch dbn_features')
-    os.system('cat /dev/null > dbn_features')
-    f = open('dbn_features', 'w')
-=======
-    get_fn,  label_fn = dbn.get_features (datasets = datasets)
-    #label_fn = dbn.get_features (datasets = datasets)
->>>>>>> 67f9c76b69b66bf86ca0ab8d6dfcc389eedd1ae3
+    get_fn, label_fn = dbn.get_features (datasets = datasets)
 
     #Output File
     os.system('touch dbn_features')
@@ -522,7 +486,6 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
     
     #for training_index in xrange(n_train_batches):
     for training_index in range(1, 563):
-<<<<<<< HEAD
 
     #dbnout = DBN(numpy_rng = numpy_rng, n_ins = 52, 
     #              hidden_layers_sizes = [30,30,30],
@@ -535,34 +498,15 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
         print features
         print label
 
-
-        features = get_fn(training_index)
-        label = label_fn(training_index)
-        #print type(features)
-        #print len(features)
-        #print label
-        print features
-=======
-        features = get_fn(training_index)
-        label = label_fn(training_index)
-        #print type(features)
-        #print len(features)
-        #print label
-        print features
->>>>>>> 67f9c76b69b66bf86ca0ab8d6dfcc389eedd1ae3
         feature_string = ""
         for i in range(0, len(features[0])):
             x = features[0][i]
             feature_string = feature_string + x.astype('|S999') + ' '
             #print features[0][i-1]
-<<<<<<< HEAD
+
         f.write(label.astype('str'))
 	f.write(' ')
         f.write(feature_string)
-=======
-        f.write(feature_string+'\n')
-        f.write(label.astype('str'))
->>>>>>> 67f9c76b69b66bf86ca0ab8d6dfcc389eedd1ae3
         f.write('\n')
     f.close()
 
