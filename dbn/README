@@ -1,0 +1,11 @@
+=======================================================================================
+Johnny		2012.03.31
+=======================================================================================
+The main function is "DBN.py" under /src. It will search for the following three files:
+
+data_c17_train.txt
+data_c17_valid.txt
+data_c17_test.txt
+
+under /data/cornell and output "dbn_features.txt" under /src.
+=======================================================================================
