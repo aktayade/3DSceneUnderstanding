@@ -1,0 +1,15 @@
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=mex 2012.4.6)  9 APR 2012 19:24
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**q
+(/usr/local/texlive/2011/texmf-dist/tex/latex/tools/q.tex
+This is MeX  Version 1.05  18 XII 1993  (B. Jackowski & M. Ry\'cko)
+File ignored
+)
+! Emergency stop.
+<*> q
+     
+*** (job aborted, no legal \end found)
+
+No pages of output.
