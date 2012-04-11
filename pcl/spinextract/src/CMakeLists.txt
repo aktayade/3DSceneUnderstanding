@@ -8,8 +8,8 @@ SET(SRCS
 )
 
 SET(extLinkerOption ${PCL_LIBRARIES})
-#SET(extLinkerOption ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
+#SET(extLinkerOption ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} ${PCL__LIBRARIES})
 
-ADD_EXECUTABLE(pcdbin2pcdascii ${SRCS})
-TARGET_LINK_LIBRARIES(pcdbin2pcdascii ${extLinkerOption})
+ADD_EXECUTABLE(spinextract ${SRCS})
+TARGET_LINK_LIBRARIES(spinextract ${extLinkerOption})
 
