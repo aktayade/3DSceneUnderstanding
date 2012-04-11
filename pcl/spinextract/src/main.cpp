@@ -1,98 +1,54 @@
 #include <iostream>
 #include <vector>
 
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
 #include <pcl/io/pcd_io.h>
-#include <pcl/visualization/cloud_viewer.h>
+#include <pcl/point_types.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/features/spin_image.h>
 
-using namespace std;
-using namespace pcl;
-
-struct PointXYZRGBCamSL {
-    PCL_ADD_POINT4D;
-
-    union
-	{
-        struct
-		{
-            float rgb;
-        };
-        float data_c[4];
-    };
-
-    uint32_t cameraIndex;
-    float distance;
-    uint32_t segment;
-    uint32_t label;
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-} EIGEN_ALIGN16;
-
-POINT_CLOUD_REGISTER_POINT_STRUCT(
-        PointXYZRGBCamSL,
-        (float, x, x)
-        (float, y, y)
-        (float, z, z)
-        (float, rgb, rgb)
-        (uint32_t, cameraIndex, cameraIndex)
-        (float, distance, distance)
-        (uint32_t, segment, segment)
-        (uint32_t, label, label)
-        )
-
-int main (int argc, char** argv)
+int
+main (int, char** argv)
 {
-	if(argc != 3)
-	{
-		cout << "Incorrect number of arguments. Usage: spinextract <Input PCD File> <Output ASCII Filename>" << endl;
-		return -2;
-	}
+  std::string filename = argv[1];
+  std::cout << "Reading " << filename << std::endl;
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
 
-	pcl::PointCloud<PointXYZRGBCamSL>::Ptr cloud(new pcl::PointCloud<PointXYZRGBCamSL>);
-//	pcl::PointCloud<PointXYZRGB>::Ptr cloud(new pcl::PointCloud<PointXYZRGB>);
-//	sensor_msgs::PointCloud2 cloud_blob;
+  if (pcl::io::loadPCDFile <pcl::PointXYZ> (filename.c_str (), *cloud) == -1)
+  // load the file
+  {
+    PCL_ERROR ("Couldn't read file");
+    return (-1);
+  }
+  std::cout << "Loaded " << cloud->points.size () << " points." << std::endl;
 
-	if(pcl::io::loadPCDFile(argv[1], *cloud) == -1)
-	{
-		PCL_ERROR ("Couldn't read file \n");
-		return -1;
-	}
-//	pcl::fromROSMsg(cloud_blob, *cloud);
+  // Compute the normals
+  pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> normal_estimation;
+  normal_estimation.setInputCloud (cloud);
 
-	if(pcl::io::savePCDFile(std::string("../data/ascii/")+std::string(argv[2]), *cloud, false) == -1) //* save the ascii file
-	{
-		cout << "Problem writing ASCII file. Not writing." << endl;
-	}
+  pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree (new pcl::search::KdTree<pcl::PointXYZ>);
+  normal_estimation.setSearchMethod (kdtree);
 
-//	cout << "Loaded "
-//			<< cloud->width * cloud->height
-//		    << " data points from .pcd file with the following fields: "
-//		    << std::endl;
+  pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud< pcl::Normal>);
+  normal_estimation.setRadiusSearch (0.03);
+  normal_estimation.compute (*normals);
 
-// CODE TO EXTRACT RGB
-//	for(size_t i = 0; i < cloud->points.size(); ++i)
-//	{
-//		uint32_t rgb = *reinterpret_cast<int*>(&cloud->points[i].rgb);
+  // Setup spin image computation
+  pcl::SpinImageEstimation<pcl::PointXYZ, pcl::Normal, pcl::Histogram<153> > spin_image_descriptor(8, 0.5, 16);
+  spin_image_descriptor.setInputCloud (cloud);
+  spin_image_descriptor.setInputNormals (normals);
 
-//		uint8_t r = (rgb >> 16) & 0x0000ff;
-//		uint8_t g = (rgb >> 8)  & 0x0000ff;
-//		uint8_t b = (rgb)       & 0x0000ff;
+  // Use the same KdTree from the normal estimation
+  spin_image_descriptor.setSearchMethod (kdtree);
+  pcl::PointCloud<pcl::Histogram<153> >::Ptr spin_images (new pcl::PointCloud<pcl::Histogram<153> >);
+  spin_image_descriptor.setRadiusSearch (0.2);
 
-//		cout << +r << ", " << +g << ", " << +b << endl;
-//	}
+  // Actually compute the spin images
+  spin_image_descriptor.compute (*spin_images);
+  std::cout << "SI output points.size (): " << spin_images->points.size () << std::endl;
 
-//	for(size_t i = 0; i < 10/*cloud->points.size()*/; ++i)
-//	{
-//		cout << "X: " << cloud->points[i].x << " Y: " << cloud->points[i].y << " Z: " << cloud->points[i].z << endl;
-//	}
+  // Display and retrieve the spin image descriptor vector for the first point.
+  pcl::Histogram<153> first_descriptor = spin_images->points[0];
+  std::cout << first_descriptor << std::endl;
 
-	pcl::visualization::CloudViewer viewer("Simple Cloud Viewer");
-	viewer.showCloud(cloud);
-	while(!viewer.wasStopped())
-	{
-
-	}
-
-	return 0;
+  return 0;
 }
-
