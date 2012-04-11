@@ -1,2 +1,2 @@
 1. Try using the SVM on only the features extracted by the DBN
-1. Now try using the SVM on both the original features and the features extracted by the DBN
+2. Now try using the SVM on both the original features and the features extracted by the DBN
