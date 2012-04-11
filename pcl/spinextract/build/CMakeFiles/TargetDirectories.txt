@@ -1,1 +1,0 @@
-/home/srinath/Desktop/545Project/code/3DSceneUnderstanding/FeatureExtract/spinextract/build/src/CMakeFiles/spinextract.dir
