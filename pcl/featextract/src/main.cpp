@@ -15,7 +15,7 @@ const int nr_octaves = 3;
 const int nr_scales_per_octave = 3;
 const float min_contrast = 10.0;
 
-int main (int argc, char ** argv)
+int main(int argc, char ** argv)
 {
 	if(argc != 2)
 	{

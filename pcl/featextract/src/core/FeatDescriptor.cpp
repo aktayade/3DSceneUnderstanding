@@ -1,4 +1,7 @@
 #include "FeatDescriptor.hpp"
+#include <fstream>
+
+using namespace std;
 
 FeatDescriptor::FeatDescriptor(void) : 
 	m_KdTree(new pcl::search::KdTree<PointXYZRGB >),
@@ -21,13 +24,17 @@ FeatDescriptor::~FeatDescriptor(void)
 
 bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<int > Indices)
 {
+	IndicesPtr indicesptr(new std::vector<int> (Indices));
+
 	std::cout << "Setting some normal params." << std::endl;
 	m_NormalEstimator.setInputCloud(Cloud);
 	m_NormalEstimator.setSearchMethod(m_KdTree);
+//	m_NormalEstimator.setIndices(indicesptr);
 
-	m_NormalEstimator.setRadiusSearch(2.0);
+	m_NormalEstimator.setRadiusSearch(0.5);
 	std::cout << "Computing normals." << std::endl;
 	m_NormalEstimator.compute(*m_Normals);
+	std::cout << "Number of indices in normal estimation: " << m_NormalEstimator.getIndices()->size() << std::endl;
 
 	SpinImageEstimation<PointXYZRGB, Normal, Histogram<153 > > m_SPIN(8, 0.5, 16);
 	std::cout << "Setting some spin image params." << std::endl;
@@ -41,14 +48,21 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 	m_SPIN.setRadiusSearch(2.0);
 
 	// Actually compute the spin images
-	IndicesPtr indicesptr(new std::vector<int> (Indices));
 	m_SPIN.setIndices(indicesptr);
+	std::cout << "Number of indices in SPIN image estimation: " << m_SPIN.getIndices()->size() << std::endl;
 	std::cout << "Computing spin image." << std::endl;
 	m_SPIN.compute(*spin_images);
 	std::cout << "SI output points.size (): " << spin_images->points.size () << std::endl;
 
-	// Display and retrieve the spin image descriptor vector for the first point.
-	pcl::Histogram<153> first_descriptor = spin_images->points[0];
-	std::cout << first_descriptor << std::endl;
+	fstream FileStr;
+	FileStr.open("features.dat", fstream::in | fstream::out | fstream::app);
+
+	for (int i = 0; i < spin_images->points.size(); ++i)
+	{
+		pcl::Histogram<153> feat_line = spin_images->points[i];
+		FileStr << feat_line << std::endl;
+	}
+
+	FileStr.close();
 }
 
