@@ -9,12 +9,6 @@
 using namespace std;
 using namespace pcl;
 
-// Constants from http://pastebin.com/8s5k8M1A
-const float min_scale = 0.01;
-const int nr_octaves = 3;
-const int nr_scales_per_octave = 3;
-const float min_contrast = 10.0;
-
 int main(int argc, char ** argv)
 {
 	if(argc != 2)
@@ -40,8 +34,6 @@ int main(int argc, char ** argv)
 	viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, "keypoints");
 	viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 0.0, 0.0, "keypoints");
 	viewer.spin();
-
-	cout << "Size of siftcloud is " << PCData->GetKeypointDetector()->GetKeypoints()->points.size() << endl;
 
 	while(!viewer.wasStopped()) {}
 

@@ -4,6 +4,7 @@ FeatKeypoint::FeatKeypoint(void) :
 	m_Keypoints(new PointCloud<PointWithScale >),
 	m_FeatCloudKdTree(new pcl::search::KdTree<PointXYZRGB >)
 {
+	// PARAM
 	// Constants from http://pastebin.com/8s5k8M1A
 	const float min_scale = 0.01;
 	const int nr_octaves = 3;

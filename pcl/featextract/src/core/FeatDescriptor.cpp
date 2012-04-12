@@ -31,12 +31,12 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 	m_NormalEstimator.setSearchMethod(m_KdTree);
 //	m_NormalEstimator.setIndices(indicesptr);
 
-	m_NormalEstimator.setRadiusSearch(0.5);
+	m_NormalEstimator.setRadiusSearch(0.5); // PARAM
 	std::cout << "Computing normals." << std::endl;
 	m_NormalEstimator.compute(*m_Normals);
 	std::cout << "Number of indices in normal estimation: " << m_NormalEstimator.getIndices()->size() << std::endl;
 
-	SpinImageEstimation<PointXYZRGB, Normal, Histogram<153 > > m_SPIN(8, 0.5, 16);
+	SpinImageEstimation<PointXYZRGB, Normal, Histogram<153 > > m_SPIN(8, 0.5, 16); // PARAM
 	std::cout << "Setting some spin image params." << std::endl;
 	// Setup spin image computation
 	m_SPIN.setInputCloud(Cloud);
@@ -44,8 +44,9 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 
 	// Use the same KdTree from the normal estimation
 	m_SPIN.setSearchMethod(m_KdTree);
+	// PARAM 153
 	pcl::PointCloud<pcl::Histogram<153> >::Ptr spin_images(new pcl::PointCloud<pcl::Histogram<153> >);
-	m_SPIN.setRadiusSearch(2.0);
+	m_SPIN.setRadiusSearch(2.0); // PARAM
 
 	// Actually compute the spin images
 	m_SPIN.setIndices(indicesptr);
