@@ -15,6 +15,13 @@ FeatPointCloud::FeatPointCloud(const std::string& CloudFile) :
 		std::cout << "Successfully loaded " << CloudFile << "." << std::endl;
 }
 
+FeatPointCloud::FeatPointCloud(PointCloud<PointXYZRGBCamSL >::Ptr Cloud, std::vector<int > CopyIndices) :
+	m_Cloud(new PointCloud<PointXYZRGB >),
+	m_KeypointDetector(new FeatKeypoint)
+{
+	pcl::copyPointCloud(*Cloud, CopyIndices, *m_Cloud);
+}
+
 FeatPointCloud::~FeatPointCloud()
 {
 
@@ -51,8 +58,10 @@ void FeatPointCloud::SnapKeypoints2Cloud(void)
 		m_KNNKdTree.nearestKSearch(*siftcloud_XYZRGB, i, 1, PtIdx, PtDist);
 		m_KeypointIndices.push_back(PtIdx.at(0));
 	}
+	
+	m_NumKeypoints = m_KeypointIndices.size();
 
-	std::cout << "Done snapping keypoints to point cloud." << std::endl;
+//	std::cout << "Done snapping keypoints to point cloud." << std::endl;
 }
 
 std::vector<int > FeatPointCloud::GetKeypointIndices(void)

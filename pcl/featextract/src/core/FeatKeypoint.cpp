@@ -24,10 +24,9 @@ FeatKeypoint::~FeatKeypoint(void)
 
 bool FeatKeypoint::Compute(PointCloud<PointXYZRGB >::Ptr Cloud)
 {
-	std::cout << Cloud->points.size() << " points in loaded point cloud." << std::endl;
 	m_SIFT.setInputCloud(Cloud);
 	m_SIFT.compute(*m_Keypoints);
-	std::cout << m_Keypoints->points.size() << " keypoints detected successfully." << std::endl;
+//	std::cout << "Cloud size\t" << Cloud->points.size() << "\tSIFT Keypoints\t" << m_Keypoints->points.size() << std::endl;
 
 	return true;
 }
