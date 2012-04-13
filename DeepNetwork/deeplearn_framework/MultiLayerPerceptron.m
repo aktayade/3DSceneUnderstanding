@@ -28,6 +28,11 @@ classdef MultiLayerPerceptron < handle
             % binaryInput is true if the first layer is [0,1], else false
             % useRBMs is true if RBMs should be used for pretraining
             %   instead of deterministic autoencoders
+            if strcmp('__clone__', name)
+                obj.networkTrainingStage = 0;
+                obj.softmaxClassifier = struct;
+                return;
+            end
             filename = ['SavedNetworks/' name '.mat'];
             if exist(filename, 'file')
                 a = input('Load existing network?\n', 's');
@@ -53,6 +58,17 @@ classdef MultiLayerPerceptron < handle
             obj.networkTrainingStage = 0;
             obj.networkName = name;
             obj.softmaxClassifier = struct;
+        end
+        
+        function new = Clone(obj, name_extension)
+            new = MultiLayerPerceptron('__clone__');
+            for l = 1:length(obj.layers)
+                new.layers{l} = obj.layers{l}.Clone();
+            end
+            new.numClasses = obj.numClasses;
+            new.networkTrainingStage = obj.networkTrainingStage;
+            new.networkName = [obj.networkName name_extension];
+            new.softmaxClassifier = obj.softmaxClassifier;
         end
         
         function obj = DoEverything(obj, trainingData, trainingLabels, quick)
@@ -140,7 +156,7 @@ classdef MultiLayerPerceptron < handle
             if quick
                 SearchN = 3;
             else
-                SearchN = 15;
+                SearchN = 20;
             end
             transformedData = pretrainData;
             for l = 1:length(obj.layers)

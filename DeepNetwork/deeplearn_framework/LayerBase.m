@@ -16,6 +16,7 @@ classdef LayerBase < handle
         transformed = FeedForward(obj, data)
         da = BackpropDerivitive(obj, activations)
         searchSpace = GetModelSelectionSearchSpace(N)
+        new = Clone(obj)
     end
     
 end

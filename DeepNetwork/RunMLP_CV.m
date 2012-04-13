@@ -1,16 +1,17 @@
 % This code will train a deep network using RBMs or stacked autoencoders
 % Data is expected to be DxN (Features x Examples)
-% Training labels are expected to be 1:K
+% Training labels are expected to be 1:J
+% Splits the data into K fold cross validation and reports this accuracy
+% Does model selection on the whole framework adjusting sparsity
 addpath(genpath('deeplearn_framework'));
 outputFolder = 'results/';
 
 load('home.mat');
 data = data';
-trainInd = crossvalind('holdout', data(3,:), 0.3); % 30 percent testing
-trainingData = data(4:end, trainInd);
-trainingLabels = data(3, trainInd);
-testingData = data(4:end, ~trainInd);
-testingLabels = data(3, ~trainInd);
+K = 4;
+cvIndices = crossvalind('Kfold', data(3,:), K);
+trainingData = data(4:end, :);
+trainingLabels = data(3, :);
 
 trialName = 'OriginalFeatures';     % Base file name for saving output
 binaryInput = false;                % True if features are between [0,1]
@@ -27,7 +28,6 @@ betaParameters = [3 3];             % Weight of the sparsity parameter
 
 % Standardize the data to have zero mean unit variance
 [trainingData, dataMean, dataStd] = StandardizeData(trainingData);
-testingData = StandardizeData(testingData, dataMean, dataStd);
 
 if useRBMs
     pretrainType = 'RBM';
@@ -39,33 +39,44 @@ for ii = 1:length(hiddenLayers)
     layerName = [layerName sprintf('_%i', hiddenLayers(ii))];
 end
 
-mlp = MultiLayerPerceptron(sprintf('%s_%s%s', trialName, pretrainType, layerName), hiddenLayers, numClasses, binaryInput, useRBMs);
+mlp = MultiLayerPerceptron(sprintf('%s_%s%s_CrossVal', trialName, pretrainType, layerName), hiddenLayers, numClasses, binaryInput, useRBMs);
 
-if modelSelection
-    mlp.PretrainModelSelection(trainingData, trainingLabels, false);
-else
-    mlp.Pretrain(trainingData, false, sparsityParameters, lambdaParameters, betaParameters);
+mlp.PretrainModelSelection(trainingData, trainingLabels, false);
+
+models = cell(K,1);
+preFineTuneAccuracyBuf = zeros(K,1);
+fineTuneAccuracyBuf = zeros(K,1);
+for k = 1:K
+    models{k} = mlp.Clone(sprintf('_%i', k));
 end
-mlp.TrainSoftmax(trainingData, trainingLabels);
-preFineTunePred = mlp.Predict(testingData);
-preFineTuneAccuracy = mean(testingLabels(:) == preFineTunePred(:));
+parfor k = 1:K
+    test = (cvIndices == k);
+    train = ~test;
+    models{k}.TrainSoftmax(trainingData(:,train), trainingLabels(train));
+    preFineTunePred = models{k}.Predict(trainingData(:,test));
+    tempTestLabels = trainingLabels(test);
+    preFineTuneAccuracyBuf(k) = mean(tempTestLabels(:) == preFineTunePred(:));
 
-mlp.FineTune(trainingData, trainingLabels, false);
-fineTunePred = mlp.Predict(testingData);
-fineTuneAccuracy = mean(testingLabels(:) == fineTunePred(:));
+    models{k}.FineTune(trainingData(:,train), trainingLabels(train), false);
+    fineTunePred = models{k}.Predict(trainingData(:,test));
+    tempTestLabels = trainingLabels(test);
+    fineTuneAccuracyBuf(k) = mean(tempTestLabels(:) == fineTunePred(:));
+end
+
+preFineTuneAccuracy = mean(preFineTuneAccuracyBuf);
+fineTuneAccuracy = mean(fineTuneAccuracy);
 
 fprintf('Before Finetuning Test Accuracy: %0.3f%%\n', preFineTuneAccuracy * 100);
 fprintf('After Finetuning Test Accuracy: %0.3f%%\n', fineTuneAccuracy * 100);
 
 transformedTrainingData = mlp.TransformData(trainingData);
-transformedTestingData = mlp.TransformData(testingData);
 
 % Save the result
 if ~exist(outputFolder,'dir')
     mkdir(outputFolder);
 end
 save(sprintf('%s%s_%s.mat', outputFolder, mlp.networkName), 'preFineTuneAccuracy', 'fineTuneAccuracy',...
-    'transformedTrainingData', 'transformedTestingData', 'trainingLabels', 'testingLabels');
+    'transformedTrainingData', 'trainingLabels');
 
 
 

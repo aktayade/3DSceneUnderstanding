@@ -260,8 +260,8 @@ for t=1:maxiter
     subplot(2,1,2), plot(sparsity_history); title('sparsity')
 
     if mod(t, 1)==0
-        save_from_cpu(fname_mat, W, hbias, vbias, pars, error_history, sparsity_history);
-        fprintf('saved as %s\n', fname_mat);
+        %save_from_cpu(fname_mat, W, hbias, vbias, pars, error_history, sparsity_history);
+        %fprintf('saved as %s\n', fname_mat);
     end
     
     toc
@@ -278,7 +278,7 @@ stats.sparsity_history = sparsity_history;
 W = W'/sigma;
 hbias = hbias/sigma;
 
-save_from_cpu(fname_mat, W, hbias, vbias, pars, error_history, sparsity_history);
+%save_from_cpu(fname_mat, W, hbias, vbias, pars, error_history, sparsity_history);
 
 %figure(3), display_network_nonsquare(single(W));
 %saveas(gcf, fname_png);

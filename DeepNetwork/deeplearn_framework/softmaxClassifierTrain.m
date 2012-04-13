@@ -24,6 +24,7 @@ theta = 0.005 * randn(numClasses * inputSize, 1);
 
 % Use minFunc to minimize the function
 globalPaths;
+addpath minFunc/
 options.Method = 'lbfgs';
 options.display = 'on';
 options.maxIter = maxIter;

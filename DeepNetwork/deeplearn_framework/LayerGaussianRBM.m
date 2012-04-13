@@ -21,6 +21,16 @@ classdef LayerGaussianRBM < LayerBase
             obj.quickModelSelect = false;
         end
         
+        function new = Clone(obj)
+            new = LayerGaussianRBM(obj.hiddenSize);
+            new.W = obj.W;
+            new.b = obj.b;
+            new.pretrained = obj.pretrained;
+            new.optimalParameters = obj.optimalParameters;
+            new.modelSelectionWork = obj.modelSelectionWork;
+            new.quickModelSelect = obj.quickModelSelect;
+        end
+        
         function obj = Pretrain(obj, data, sparsityParam, lambda, beta, quick)
             maxIter = obj.quickPretrainMaxIter*quick + obj.fullPretrainMaxIter*~quick;
             [obj.W, obj.b] = rbm_train_LB_hinton(data, obj.hiddenSize, sparsityParam, lambda, beta, maxIter);
