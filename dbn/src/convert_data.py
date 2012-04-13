@@ -7,7 +7,8 @@ from theano import *
 import theano.tensor as T
 
 def load_cornell_data():
-	datf = open('../data/cornell/data_split5_train.txt')
+	#datf = open('../data/cornell/data_split5_train.txt')
+        datf = open('../data/cornell/data_c17_train.txt')
 	lines = datf.readlines()
 
 	# Loop through each line and perform operations
@@ -37,8 +38,10 @@ def load_cornell_data():
 		OddLine = not(OddLine)
 					
 	FinalTupTrain = (FeatureMat, LabelVec)
+        #print len(FeatureMat)
 
-	datf = open('../data/cornell/data_split5_test.txt')
+	#datf = open('../data/cornell/data_split5_test.txt')
+        datf = open('../data/cornell/data_c17_test.txt')
 	lines = datf.readlines()
 
 	# Loop through each line and perform operations
@@ -70,7 +73,8 @@ def load_cornell_data():
 	FinalTupTest = (FeatureMat, LabelVec)
 
 
-	datf = open('../data/cornell/data_split5_valid.txt')
+	#datf = open('../data/cornell/data_split5_valid.txt')
+        datf = open('../data/cornell/data_c17_valid.txt')
 	lines = datf.readlines()
 
 	# Loop through each line and perform operations

@@ -29,7 +29,7 @@ class DBN(object):
 #    def __init__(self, numpy_rng, theano_rng = None, n_ins = 784, 
 #                 hidden_layers_sizes = [500,500], n_outs = 10):
     def __init__(self, numpy_rng, theano_rng = None, n_ins = 52, 
-                 hidden_layers_sizes = [30,30], n_outs = 10):
+                 hidden_layers_sizes = [30,30], n_outs = 17):
         """This class is made to support a variable number of layers. 
 
         :type numpy_rng: numpy.random.RandomState
@@ -54,8 +54,8 @@ class DBN(object):
         self.sigmoid_layers = []
         self.rbm_layers     = []
         self.params         = []
-#        self.n_layers       = len(hidden_layers_sizes)
-        self.n_layers       = 1
+        self.n_layers       = len(hidden_layers_sizes)
+        #self.n_layers       = 1
 
         assert self.n_layers > 0
 
@@ -214,6 +214,20 @@ class DBN(object):
                 self.x : train_set_x[index*batch_size:(index+1)*batch_size],
                 self.y : train_set_y[index*batch_size:(index+1)*batch_size]})
 
+        my_fn = theano.function(inputs = [index], 
+        #      #outputs = self.params,
+              outputs = self.sigmoid_layers[-1].output,
+              updates = updates,
+              givens  = {
+                self.x : train_set_x[index*batch_size:(index+1)*batch_size],
+                self.y : train_set_y[index*batch_size:(index+1)*batch_size]})
+
+        #my_fn = theano.function(inputs = [index], 
+        #      outputs = self.params,
+        #      givens  = {
+        #        self.x : train_set_x[1:1],
+        #        self.y : train_set_y[1:1]})
+
         test_score_i = theano.function([index], self.errors,
                  givens = {
                    self.x: test_set_x[index*batch_size:(index+1)*batch_size],
@@ -232,11 +246,44 @@ class DBN(object):
         def test_score():
             return [test_score_i(i) for i in xrange(n_test_batches)]
 
-        return train_fn, valid_score, test_score
+        #return train_fn, valid_score, test_score
+        return my_fn, train_fn, valid_score, test_score
 
 
+    ##########################################################################
+    # Added by Johnny
+    def get_features(self, datasets):
+        
+        (train_set_x, train_set_y) = datasets[0]
+        
+        index   = T.lscalar('index')
+
+        get_fn = theano.function(inputs = [index],
+              outputs = self.sigmoid_layers[-1].output,
+              #outputs = self.params,
+              #outputs = self.x,
+              givens  = {
+                #self.x : train_set_x[2:3],
+                #self.y : train_set_y[2:3]})
+                self.x : train_set_x[index:index+1],
+                self.y : train_set_y[index:index+1]})
+
+        label_fn = theano.function(inputs = [index], 
+              outputs = self.y,
+              #outputs = self.params,
+              givens  = {
+                self.x : train_set_x[index:index+1],
+                self.y : train_set_y[index:index+1]})
+        
+        return get_fn, label_fn
+    ##########################################################################
+
+
+#def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
+#              pretrain_lr = 0.01, k = 1, training_epochs = 1000, \
+#              dataset='../data/mnist.pkl.gz', batch_size = 20):
 def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
-              pretrain_lr = 0.01, k = 1, training_epochs = 1000, \
+              pretrain_lr = 0.5, k = 1, training_epochs = 1000, \
               dataset='../data/mnist.pkl.gz', batch_size = 10):
     """
     Demonstrates how to train and test a Deep Belief Network.
@@ -260,7 +307,7 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
     """
 
 
-    #datasets = load_data(dataset)
+#    datasets = load_data(dataset)
     # Loading Cornell data instead of the MNIST data
     # Note the feature vector size was changed from 784 (28*28) into 52 in all places
     datasets = load_cornell_data()
@@ -268,9 +315,11 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
     train_set_x, train_set_y = datasets[0]
     valid_set_x, valid_set_y = datasets[1]
     test_set_x , test_set_y  = datasets[2]
+    #print len(train_set_x.get_value())
 
     # compute number of minibatches for training, validation and testing
     n_train_batches = train_set_x.get_value(borrow=True).shape[0] / batch_size
+    #print n_train_batches
 
     # numpy random generator
     numpy_rng = numpy.random.RandomState(123)
@@ -278,8 +327,12 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
     # construct the Deep Belief Network
 #    dbn = DBN(numpy_rng = numpy_rng, n_ins = 28*28, 
     dbn = DBN(numpy_rng = numpy_rng, n_ins = 52, 
-              hidden_layers_sizes = [1000,1000,1000],
-              n_outs = 10)
+#              hidden_layers_sizes = [1000,1000,1000],
+#              n_outs = 10)
+#              hidden_layers_sizes = [5,5,5],
+#              n_outs = 10)
+              hidden_layers_sizes = [30,30,30],
+              n_outs = 17)
     
 
     #########################
@@ -313,7 +366,8 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
 
     # get the training, validation and testing function for the model
     print '... getting the finetuning functions'
-    train_fn, validate_model, test_model = dbn.build_finetune_functions ( 
+    #train_fn, validate_model, test_model = dbn.build_finetune_functions ( 
+    my_fn, train_fn, validate_model, test_model = dbn.build_finetune_functions ( 
                 datasets = datasets, batch_size = batch_size, 
                 learning_rate = finetune_lr) 
 
@@ -341,9 +395,20 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
 
     while (epoch < training_epochs) and (not done_looping):
       epoch = epoch + 1
+      #print n_train_batches
       for minibatch_index in xrange(n_train_batches):
 
-        minibatch_avg_cost = train_fn(minibatch_index)
+        #print type(minibatch_index)
+        #print minibatch_index
+        #minibatch_avg_cost = train_fn(minibatch_index)
+        #my_var = my_fn(minibatch_index)
+        #print type(my_var)
+        #print len(my_var)
+        #print my_var
+        #print type(my_var[0])
+        #print len(my_var[0])
+        #print size(my_var[0])
+        #print my_var[0]
         iter    = epoch * n_train_batches + minibatch_index
 
         if (iter+1) % validation_frequency == 0: 
@@ -386,8 +451,64 @@ def test_DBN( finetune_lr = 0.1, pretraining_epochs = 100, \
                  (best_validation_loss * 100., test_score*100.))
     print >> sys.stderr, ('The fine tuning code for file '+os.path.split(__file__)[1]+' ran for %.2fm' % ((end_time-start_time)/60.))
 
-    print type(dbn.sigmoid_layers[-1].output[0][0])
+    #print type(dbn.sigmoid_layers[-1].output[0][0])
+    #print dbn.sigmoid_layers[-1].output[0][0]
+    #print type(dbn.x)
+    #print dbn.x
+    #print len(dbn.params)
+    #print type(dbn.params[0])
+    #xx = T.matrix()
+    #test = theano.printing.Print('test')(xx)
+    #f = theano.function([xx], test)
+    #f(dbn.sigmoid_layers[-1].output[0][0])
+    
+    #a = T.dscalar()
+    #test1 = theano.printing.Print('test1')(a)
+    #f = theano.function([a],test1)
+    #f(2)
+            
+    #printed_x = hello_world_op(dbn.sigmoid_layers[-1].output[0][0])
+    
+    #print type(dbn.params[0])
 
+    ##########################
+    # EXTRACTING THE FEATURE #
+    ##########################
+
+    print '... extracting the feature'
+
+    get_fn, label_fn = dbn.get_features (datasets = datasets)
+
+    #Output File
+    os.system('touch dbn_features')
+    os.system('cat /dev/null > dbn_features')
+    f = open('dbn_features', 'w')
+    
+    #for training_index in xrange(n_train_batches):
+    for training_index in range(1, 563):
+
+    #dbnout = DBN(numpy_rng = numpy_rng, n_ins = 52, 
+    #              hidden_layers_sizes = [30,30,30],
+    #              n_outs = 17)
+
+        features = get_fn(training_index)
+        label = label_fn(training_index)
+        print type(features)
+        #print len(features)
+        print features
+        print label
+
+        feature_string = ""
+        for i in range(0, len(features[0])):
+            x = features[0][i]
+            feature_string = feature_string + x.astype('|S999') + ' '
+            #print features[0][i-1]
+
+        f.write(label.astype('str'))
+	f.write(' ')
+        f.write(feature_string)
+        f.write('\n')
+    f.close()
 
 if __name__ == '__main__':
     test_DBN()
