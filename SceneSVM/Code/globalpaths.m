@@ -2,11 +2,11 @@
 % All paths that may change should be added in this file
 
 % Datasets:
-addpath('C:\Users\Tyler\Desktop\SceneSVM\Dataset');
+addpath('C:\Users\Tyler\Desktop\SceneProject\SceneSVM\Dataset');
 
 % Code:
 addpath('.\Code_HyperParameter_Search');
 addpath('.\Classifiers');
 
 % Misc:
-outputFolder = 'C:\Users\Tyler\Desktop\SceneSVM\Output';
+outputFolder = 'C:\Users\Tyler\Desktop\SceneProject\SceneSVM\Output';

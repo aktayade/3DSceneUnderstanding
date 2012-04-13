@@ -12,17 +12,17 @@ end
 rand('state', sum(100*clock));
 randn('state', sum(100*clock));
 
-load value.mat;
-X = value(:,4:end)';
-clear value;
+load home.mat;
+X = zscore(data(:,4:end))';
 
 fname_prefix = sprintf('results/belief_OLSHAUSEN_V1_sparse_w%02d', ws);
 [W vbias_vec hbias_vec pars error_history fname_out] = train_rbm_LB_sparse(X, fname_prefix, 'num_bases', num_bases, 'pbias', pbias, 'bias_mode', bias_mode, 'batch_size', batch_size, 'num_trials', num_trials, 'epsilon', epsilon);
+[ferr dW dv dh poshidprobs poshidstates negdata]= fobj_rbm_CD_LB_sparse(X, W, vbias_vec, hbias_vec, pars, 'sample', bias_mode);
 
-[~, ~, ~, A, X, B, ~]= fobj_rbm_CD_LB_sparse(X, W, vbias_vec, hbias_vec, pars, 'exp', 'hgrad')
-
-%[W vbias_vec hbias_vec pars error_history fname_out] = train_rbm_LB_sparse(X, fname_prefix, 'num_bases', num_bases, 'pbias', pbias, 'bias_mode', bias_mode, 'batch_size', batch_size, 'num_trials', num_trials, 'epsilon', epsilon);
-
+[W vbias_vec hbias_vec pars error_history fname_out] = train_rbm_LB_sparse(poshidprobs', fname_prefix, 'num_bases', num_bases, 'pbias', pbias, 'bias_mode', bias_mode, 'batch_size', batch_size, 'num_trials', num_trials, 'epsilon', epsilon);
+[ferr dW dv dh poshidprobs poshidstates negdata]= fobj_rbm_CD_LB_sparse(poshidprobs', W, vbias_vec, hbias_vec, pars, 'sample', bias_mode);
+data = [data(:,1:3) poshidprobs];
+save('home-gaussrbm.mat', 'data');
 return
 
 %%
@@ -234,11 +234,7 @@ return
 
 function [ferr dW_total dv_total dh_total poshidprobs poshidstates negdata] = ...
 	fobj_rbm_CD_LB_sparse(Xb, W, vbias, hbias, pars, opt_CD_mode, opt_adjbias_mode)
-% poshidprobs should be the mean activation of the hidden states used for
-% next layer.  poshidstates is just a single sampling of those probs.
-% negdata is the state of the visible layer after gibbs sampling (the
-% network's desired formulation of the data). ferr reports the means
-% squared error between negdata and the true data.
+
 weightcost_l2  = 0.0002;   
 
 numcases = size(Xb,2);
