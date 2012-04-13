@@ -14,9 +14,9 @@ using namespace pcl;
 
 int main(int argc, char ** argv)
 {
-	if(argc != 2)
+	if(argc != 3)
 	{
-		cerr << "Incorrect number of input parameters. Usage: ./featextract <Input PCD File>" << endl;
+		cerr << "Incorrect number of input parameters. Usage: ./featextract <Input PCD File> <Output Feature File>" << endl;
 		return -1;
 	}
 	
@@ -43,12 +43,18 @@ int main(int argc, char ** argv)
 		Segmenter->GetSegments().at(i)->ComputeKeypoints();
 
 		// Compute features
+		fstream FileStr;
+		FileStr.open(argv[2], fstream::in | fstream::out | fstream::app);
+
 		if(Segmenter->GetSegments().at(i)->GetNumKeypoints() > 0)
 		{
-			FeatDescriptor * spin = new FeatDescriptor();
+			FeatDescriptor * spin = new FeatDescriptor(std::string(argv[2]));
+			FileStr << Segmenter->GetLabels().at(i) << std::endl;
+			
 			spin->Compute(Segmenter->GetSegments().at(i)->GetCloud(), Segmenter->GetSegments().at(i)->GetKeypointIndices());
 			SpinImages.push_back(spin);
 		}
+		FileStr.close();
 	}
 
 //	// Visualize stuff

@@ -28,10 +28,13 @@ void FeatSegment::BreakIntoSegments(void)
 //		std::cout << "Segment number: " << std::setw(4) << INDseg;
       	std::vector<int > PtIndSeg;
 
-      	for (int i = 0; i < m_SceneCloud->points.size (); ++i)
+      	for(int i = 0; i < m_SceneCloud->points.size (); ++i)
       	{
-      		if (m_SceneCloud->points[i].segment == INDseg)
-      		  PtIndSeg.push_back(i);
+      		if(m_SceneCloud->points[i].segment == INDseg)
+			{
+      			PtIndSeg.push_back(i);
+				m_Labels.push_back(m_SceneCloud->points[i].label);
+			}
       	}
 
 		FeatPointCloud * Segment = new FeatPointCloud(m_SceneCloud, PtIndSeg);

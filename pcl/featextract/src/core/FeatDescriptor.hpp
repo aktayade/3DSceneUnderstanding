@@ -12,6 +12,7 @@ class FeatDescriptor
 {
 	public:
 		FeatDescriptor(void);
+		FeatDescriptor(const std::string FeatureFile);
 		FeatDescriptor(const int FeatType);
 		virtual ~FeatDescriptor(void);
 
@@ -21,6 +22,8 @@ class FeatDescriptor
 		NormalEstimation<PointXYZRGB, Normal > m_NormalEstimator;
 		pcl::search::KdTree<PointXYZRGB >::Ptr m_KdTree;
 		PointCloud<Normal >::Ptr m_Normals;
+
+		std::string m_FeatureFile;
 };
 
 #endif /* __FEATDESCRIPTOR_H__ */

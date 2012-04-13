@@ -10,11 +10,11 @@ FeatDescriptor::FeatDescriptor(void) :
 
 }
 
-FeatDescriptor::FeatDescriptor(const int FeatType) :
+FeatDescriptor::FeatDescriptor(const std::string FeatureFile) :
 	m_KdTree(new pcl::search::KdTree<PointXYZRGB >),
 	m_Normals(new PointCloud<Normal >)
 {
-
+	m_FeatureFile = FeatureFile;
 }
 
 FeatDescriptor::~FeatDescriptor(void)
@@ -55,15 +55,15 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 	m_SPIN.compute(*spin_images);
 //	std::cout << "SI output points.size (): " << spin_images->points.size () << std::endl;
 
-//	fstream FileStr;
-//	FileStr.open("features.dat", fstream::in | fstream::out | fstream::app);
+	fstream FileStr;
+	FileStr.open(m_FeatureFile.c_str(), fstream::in | fstream::out | fstream::app);
 
-//	for (int i = 0; i < spin_images->points.size(); ++i)
-//	{
-//		pcl::Histogram<153> feat_line = spin_images->points[i];
-//		FileStr << feat_line << std::endl;
-//	}
+	for (int i = 0; i < spin_images->points.size(); ++i)
+	{
+		pcl::Histogram<153> feat_line = spin_images->points[i];
+		FileStr << feat_line << std::endl;
+	}
 
-//	FileStr.close();
+	FileStr.close();
 }
 
