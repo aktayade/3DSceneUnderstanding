@@ -5,9 +5,9 @@ FeatPointCloud::FeatPointCloud(void)
 	std::cout << "Please use the other constructor. This is empty." << std::endl;
 }
 
-FeatPointCloud::FeatPointCloud(const std::string& CloudFile) : 
+FeatPointCloud::FeatPointCloud(const std::string& CloudFile, const std::string& ConfigFName) : 
 	m_Cloud(new PointCloud<PointXYZRGB >),
-	m_KeypointDetector(new FeatKeypoint)
+	m_KeypointDetector(new FeatKeypoint(ConfigFName))
 {
 	if(pcl::io::loadPCDFile<PointXYZRGB>(CloudFile.c_str(), *m_Cloud) == -1)
 		std::cerr << "Problem loading from file " << CloudFile << ". Nothing stored in FeatPointCloud." << std::endl;
@@ -15,9 +15,9 @@ FeatPointCloud::FeatPointCloud(const std::string& CloudFile) :
 		std::cout << "Successfully loaded " << CloudFile << "." << std::endl;
 }
 
-FeatPointCloud::FeatPointCloud(PointCloud<PointXYZRGBCamSL >::Ptr Cloud, std::vector<int > CopyIndices) :
+FeatPointCloud::FeatPointCloud(PointCloud<PointXYZRGBCamSL >::Ptr Cloud, std::vector<int > CopyIndices, const std::string& ConfigFName) :
 	m_Cloud(new PointCloud<PointXYZRGB >),
-	m_KeypointDetector(new FeatKeypoint)
+	m_KeypointDetector(new FeatKeypoint(ConfigFName))
 {
 	pcl::copyPointCloud(*Cloud, CopyIndices, *m_Cloud);
 }
@@ -55,6 +55,7 @@ void FeatPointCloud::SnapKeypoints2Cloud(void)
 		pcl::PointCloud<PointXYZRGB>::Ptr siftcloud_XYZRGB(new pcl::PointCloud<PointXYZRGB >);
 		pcl::copyPointCloud(*m_KeypointDetector->GetKeypoints(), *siftcloud_XYZRGB);
 
+		// Finding only 1-NN
 		m_KNNKdTree.nearestKSearch(*siftcloud_XYZRGB, i, 1, PtIdx, PtDist);
 		m_KeypointIndices.push_back(PtIdx.at(0));
 	}

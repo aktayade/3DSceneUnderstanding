@@ -1,8 +1,8 @@
 #include "FeatSegment.hpp"
 
-FeatSegment::FeatSegment(void)
+FeatSegment::FeatSegment(const std::string& ConfigFName)
 {
-
+	m_ConfigFName = ConfigFName;
 }
 
 FeatSegment::~FeatSegment(void)
@@ -39,7 +39,7 @@ void FeatSegment::BreakIntoSegments(void)
       	}
 		m_Labels.push_back(tmp);
 
-		FeatPointCloud * Segment = new FeatPointCloud(m_SceneCloud, PtIndSeg);
+		FeatPointCloud * Segment = new FeatPointCloud(m_SceneCloud, PtIndSeg, m_ConfigFName);
 //		std::cout << "   Size: " << std::setw(5) << Segment->GetCloud()->points.size() << std::endl;
 		m_Segments.push_back(Segment);
 	}

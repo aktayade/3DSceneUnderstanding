@@ -8,18 +8,18 @@
 #include "FeatSegment.hpp"
 #include "extern.hpp"
 
-
 using namespace std;
 using namespace pcl;
 
 int main(int argc, char ** argv)
 {
-	if(argc != 3)
+	if(argc != 4)
 	{
-		cerr << "Incorrect number of input parameters. Usage: ./featextract <Input PCD File> <Output Feature File>" << endl;
+		cerr << "Incorrect number of input parameters. Usage: ./featextract <Input PCD File> <Output Feature File> <Config File>" << endl;
 		return -1;
 	}
-	
+	// Create file if does not exist. Open it if it does
+	FileStr.open(argv[2], fstream::in | fstream::out | fstream::app);	
 
 	PointCloud<PointXYZRGBCamSL >::Ptr WholeScene(new PointCloud<PointXYZRGBCamSL >);
 	// Load data into a PointXYZRGBCamSL
@@ -29,7 +29,7 @@ int main(int argc, char ** argv)
 		std::cout << "Successfully loaded " << argv[1] << "." << std::endl;
 
 	// Split scene into segments
-	FeatSegment * Segmenter = new FeatSegment;
+	FeatSegment * Segmenter = new FeatSegment(std::string(argv[3]));
 	Segmenter->SetSceneCloud(WholeScene);
 	Segmenter->BreakIntoSegments();
 
@@ -37,37 +37,40 @@ int main(int argc, char ** argv)
 	cout << "Computing keypoints and features for segment..." << endl;
 	int NumSegments = Segmenter->GetSegments().size();
 	for(int i = 0; i < NumSegments; ++i)
+//	for(int i = 221; i < 222; ++i)
 	{
-//		cout << "Segment " << i+1 << "\t";
-		cout << i+1 << endl;
+//		cout << i+1 << endl;
 		Segmenter->GetSegments().at(i)->ComputeKeypoints();
+		cout << i << " has num keypoints as " << Segmenter->GetSegments().at(i)->GetKeypointDetector()->GetKeypoints()->points.size() << endl;
 
-		// Compute features
-		fstream FileStr;
-		FileStr.open(argv[2], fstream::in | fstream::out | fstream::app);
 
-		if(Segmenter->GetSegments().at(i)->GetNumKeypoints() > 0)
-		{
-			FeatDescriptor * spin = new FeatDescriptor(std::string(argv[2]));
-			FileStr << Segmenter->GetLabels().at(i) << std::endl;
-			
-			spin->Compute(Segmenter->GetSegments().at(i)->GetCloud(), Segmenter->GetSegments().at(i)->GetKeypointIndices());
-			SpinImages.push_back(spin);
-		}
-		FileStr.close();
+//		// Compute features
+//		if(Segmenter->GetSegments().at(i)->GetNumKeypoints() > 0)
+//		{
+//			FeatDescriptor * spin = new FeatDescriptor(std::string(argv[2]), std::string(argv[3]));
+//			FileStr << Segmenter->GetLabels().at(i) << std::endl;
+//			
+//			spin->Compute(Segmenter->GetSegments().at(i)->GetCloud(), Segmenter->GetSegments().at(i)->GetKeypointIndices());
+//			SpinImages.push_back(spin);
+//		}
 	}
 
-//	// Visualize stuff
-//	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
-//	pcl::visualization::PointCloudGeometryHandlerXYZ< PointWithScale > geometry(PCData->GetKeypointDetector()->GetKeypoints());
-//	viewer.addPointCloud(PCData->GetCloud(), "cloud");
-//	viewer.addPointCloud(PCData->GetKeypointDetector()->GetKeypoints(), geometry, "keypoints");
-//	viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, "keypoints");
-//	viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 0.0, 0.0, "keypoints");
-//	viewer.spin();
+	FileStr.close();
 
-//	while(!viewer.wasStopped()) {}
+	// Visualize stuff
+	int SegNum = 221;
+	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
+	pcl::visualization::PointCloudGeometryHandlerXYZ< PointWithScale > geometry(Segmenter->GetSegments().at(SegNum)->GetKeypointDetector()->GetKeypoints());
+	viewer.addPointCloud(Segmenter->GetSegments().at(SegNum)->GetCloud(), "cloud");
+	viewer.addPointCloud(Segmenter->GetSegments().at(SegNum)->GetKeypointDetector()->GetKeypoints(), geometry, "keypoints");
+	viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, "keypoints");
+	viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 0.0, 0.0, "keypoints");
+	viewer.spin();
+
+	while(!viewer.wasStopped()) {}	
+
 
 	return 0;
 }
+
 

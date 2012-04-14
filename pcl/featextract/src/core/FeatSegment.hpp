@@ -12,7 +12,7 @@ using namespace pcl;
 class FeatSegment
 {
 	public:
-		FeatSegment(void);
+		FeatSegment(const std::string& ConfigFName);
 		virtual ~FeatSegment(void);
 		void SetSceneCloud(PointCloud<PointXYZRGBCamSL >::Ptr SceneCloud) { m_SceneCloud = SceneCloud; };
 		void BreakIntoSegments(void);
@@ -23,6 +23,7 @@ class FeatSegment
 		std::vector<FeatPointCloud * > m_Segments;
 		std::vector<int > m_Labels;
 		PointCloud<PointXYZRGBCamSL >::Ptr m_SceneCloud;
+		std::string m_ConfigFName;
 };
 
 #endif /* __FEATSEGMENT_H__ */

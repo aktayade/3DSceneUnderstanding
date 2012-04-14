@@ -11,7 +11,7 @@ SET(SRCS
 )
 
 SET(extLinkerOption ${PCL_LIBRARIES})
-#SET(extLinkerOption ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} ${PCL__LIBRARIES})
+#SET(extLinkerOption ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} ${PCL_<>_LIBRARIES})
 
 ADD_EXECUTABLE(featextract ${SRCS})
 TARGET_LINK_LIBRARIES(featextract ${extLinkerOption})

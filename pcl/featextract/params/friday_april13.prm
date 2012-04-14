@@ -1,0 +1,13 @@
+# Last tested on Friday April-13, 2012
+NormalEstRadius=0.01
+SPINImgWidth=8
+SPINAngle=0.1
+SPINMinPts=4
+SPINRadius=0.1
+SPINHist=153
+
+SIFTMinScale=0.001
+SIFTOctaves=3
+SIFTScalesPerOctave=3
+SIFTMinContrast=1.0
+
