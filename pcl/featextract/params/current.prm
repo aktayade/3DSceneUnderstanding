@@ -9,8 +9,8 @@ USamRadius=0.03
 NormalEstRadius=0.01
 SPINImgWidth=8
 SPINAngle=0.1
-SPINMinPts=4
-SPINRadius=0.07
+SPINMinPts=1
+SPINRadius=0.1
 SPINHist=153
 
 
