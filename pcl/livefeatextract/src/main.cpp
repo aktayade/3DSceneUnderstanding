@@ -1,5 +1,4 @@
 #include <iostream>
-#include <pcl/visualization/cloud_viewer.h>
 
 #include "FeatPointCloud.hpp"
 #include "FeatKeypoint.hpp"

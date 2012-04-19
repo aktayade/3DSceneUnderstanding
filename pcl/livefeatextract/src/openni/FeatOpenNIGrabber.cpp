@@ -1,13 +1,15 @@
 #include "FeatOpenNIGrabber.hpp"
 
 FeatOpenNIGrabber::FeatOpenNIGrabber() : 
-	m_Viewer("FeatExtract PC Grabber")
+	m_Viewer("FeatExtract PC Grabber"),
+	m_CurrentCloud(new PointCloud<PointXYZRGB >)
 {
 
 }
 
 void FeatOpenNIGrabber::ShowCloud(const pcl::PointCloud<pcl::PointXYZRGBA >::ConstPtr& Cloud)
 {
+	copyPointCloud<PointXYZRGBA, PointXYZRGB >(*Cloud, *m_CurrentCloud);
 	if(!m_Viewer.wasStopped())
 		m_Viewer.showCloud(Cloud);
 }
