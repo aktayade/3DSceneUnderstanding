@@ -5,7 +5,7 @@
 #include <pcl/point_types.h>
 #include <fstream>
 
-static std::fstream FileStr;
+static std::ofstream FileStr;
 
 struct PointXYZRGBCamSL {
   PCL_ADD_POINT4D;

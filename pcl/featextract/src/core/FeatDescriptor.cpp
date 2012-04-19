@@ -75,22 +75,27 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 	m_SPIN.compute(*spin_images);
 //	std::cout << "SI output points.size (): " << spin_images->points.size () << std::std::endl;
 
-	FileStr.open(m_FeatureFile.c_str(), fstream::in | fstream::out | fstream::app);	
-	for (int i = 0; i < spin_images->points.size(); ++i)
+	// NOTE: Don't add the ios:trunc flag here!
+	FileStr.open(m_FeatureFile.c_str(), ios::app);
+	if(FileStr.is_open())
 	{
-		pcl::Histogram<153 > feat_line = spin_images->points[i];
-		// Option 1: Avoid printing commas and brackets for Johnny's sake
-		for(int i = 0; i < 152; ++i)
+		for (int i = 0; i < spin_images->points.size(); ++i)
 		{
-			FileStr << feat_line.histogram[i] << " ";
+			pcl::Histogram<153 > feat_line = spin_images->points[i];
+			// Option 1: Avoid printing commas and brackets for Johnny's sake
+			for(int i = 0; i < 153; ++i) // TODO Why 153 and not 152 here? But checked with the << for Histogram
+			{
+				FileStr << feat_line.histogram[i] << " ";
+			}
+			FileStr << std::endl;
+
+			// Option 2: Write to file using the overloaded << operator
+			// FileStr << feat_line << std::endl;
 		}
-		FileStr << std::endl;
-
-		// Option 2: Write to file using the overloaded << operator
-		// FileStr << feat_line << std::endl;
+		FileStr.close();
 	}
-
-	FileStr.close();
+	else
+		std::cout << "Problem writing to file. Please check FeatDescriptor::Compute()" << std::endl;
 
 	return true;
 }

@@ -19,7 +19,12 @@ int main(int argc, char ** argv)
 		return -1;
 	}
 	// Create file if does not exist. Open it if it does
-	FileStr.open(argv[2], fstream::in | fstream::out | fstream::app);
+	// Just clear the existing file
+	FileStr.open(argv[2], ios::trunc);
+	if(FileStr.is_open())
+		FileStr.close();
+
+	FileStr.open(argv[2], ios::app);
 
 	PointCloud<PointXYZRGBCamSL >::Ptr WholeScene(new PointCloud<PointXYZRGBCamSL >);
 	// Load data into a PointXYZRGBCamSL
@@ -42,7 +47,6 @@ int main(int argc, char ** argv)
 //		cout << i+1 << endl;
 		Segmenter->GetSegments().at(i)->ComputeKeypoints();
 		cout << i << " has num keypoints as " << Segmenter->GetSegments().at(i)->GetKeypointDetector()->GetKeypoints()->points.size() << endl;
-
 
 		// Compute features
 		if(Segmenter->GetSegments().at(i)->GetNumKeypoints() > 5) // PARAM - minimum number of keypoints
