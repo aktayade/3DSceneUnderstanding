@@ -4,7 +4,7 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/features/spin_image.h>
 
-#define FEATEXTRACT_SPIN 0
+#define M_HISTGRAM_BINS 153 // PARAM
 
 using namespace pcl;
 
