@@ -5,8 +5,10 @@ SPINImgWidth=8
 SPINAngle=0.5
 SPINMinPts=16
 SPINRadius=2.0
+KeypointType=1
 SIFTMinScale=0.01
-SIFTOctaves=3
-SIFTScalesPerOctave=3
+SIFTOctaves=5
+SIFTScalesPerOctave=5
 SIFTMinContrast=10.0
+USamRadius=0.01
 

@@ -65,7 +65,7 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 	// Use the same KdTree from the normal estimation
 	m_SPIN.setSearchMethod(m_KdTree);
 	// PARAM 153
-	pcl::PointCloud<pcl::Histogram<153> >::Ptr spin_images(new pcl::PointCloud<pcl::Histogram<153> >);
+	pcl::PointCloud<pcl::Histogram<153 > >::Ptr spin_images(new pcl::PointCloud<pcl::Histogram<153 > >);
 	m_SPIN.setRadiusSearch(m_SPINRadius); // PARAM
 
 	// Actually compute the spin images
@@ -79,7 +79,15 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 	for (int i = 0; i < spin_images->points.size(); ++i)
 	{
 		pcl::Histogram<153 > feat_line = spin_images->points[i];
-		FileStr << feat_line << std::endl;
+		// Option 1: Avoid printing commas and brackets for Johnny's sake
+		for(int i = 0; i < 152; ++i)
+		{
+			FileStr << feat_line.histogram[i] << " ";
+		}
+		FileStr << std::endl;
+
+		// Option 2: Write to file using the overloaded << operator
+		// FileStr << feat_line << std::endl;
 	}
 
 	FileStr.close();

@@ -1,3 +1,16 @@
+# Keypoint detector
+# These defaults from http://pastebin.com/8s5k8M1A work well
+# Keypoint type must always preceed the keypoint parameters. Can have multiple keypoints
+# 0 - SIFT
+# 1 - Uniform
+KeypointType=1
+SIFTMinScale=0.01
+SIFTOctaves=5
+SIFTScalesPerOctave=5
+SIFTMinContrast=10.0
+USamRadius=0.05
+
+# Descriptor
 # Notes: Used 0.5 initially and it took 3m and 10secs for office/scene1.
 # Then used 0.1 which took 23 secs for office/scene1.
 # The Cornell code uses 1cm = 0.01 which makes sense. (7 sec)
@@ -22,13 +35,9 @@ SPINMinPts=4
 # We want the descriptors for a small radius again. Starting with 10cm
 # Also reducing the min points to avoid an "increase radius error"
 # This is in metres
-SPINRadius=0.1
+# NOTE: MUST BE COMPATIBLE WITH USamRadius/SIFTMinScale
+SPINRadius=0.05
 # The default 153 must work as long as width is 8. (8*2 + 1) * 9 = 153
 SPINHist=153
 
-# These defaults from http://pastebin.com/8s5k8M1A work well
-SIFTMinScale=0.01
-SIFTOctaves=5
-SIFTScalesPerOctave=5
-SIFTMinContrast=10.0
 

@@ -13,13 +13,13 @@ using namespace pcl;
 
 int main(int argc, char ** argv)
 {
-	if(argc != 4)
+	if(argc < 4)
 	{
-		cerr << "Incorrect number of input parameters. Usage: ./featextract <Input PCD File> <Output Feature File> <Config File>" << endl;
+		cerr << "Incorrect number of input parameters. Usage: ./featextract <Input PCD File> <Output Feature File> <Config File> [<Segment number to visualize>]" << endl;
 		return -1;
 	}
 	// Create file if does not exist. Open it if it does
-	FileStr.open(argv[2], fstream::in | fstream::out | fstream::app);	
+	FileStr.open(argv[2], fstream::in | fstream::out | fstream::app);
 
 	PointCloud<PointXYZRGBCamSL >::Ptr WholeScene(new PointCloud<PointXYZRGBCamSL >);
 	// Load data into a PointXYZRGBCamSL
@@ -44,23 +44,28 @@ int main(int argc, char ** argv)
 		cout << i << " has num keypoints as " << Segmenter->GetSegments().at(i)->GetKeypointDetector()->GetKeypoints()->points.size() << endl;
 
 
-//		// Compute features
-//		if(Segmenter->GetSegments().at(i)->GetNumKeypoints() > 0)
-//		{
-//			FeatDescriptor * spin = new FeatDescriptor(std::string(argv[2]), std::string(argv[3]));
-//			FileStr << Segmenter->GetLabels().at(i) << std::endl;
-//			
-//			spin->Compute(Segmenter->GetSegments().at(i)->GetCloud(), Segmenter->GetSegments().at(i)->GetKeypointIndices());
-//			SpinImages.push_back(spin);
-//		}
+		// Compute features
+		if(Segmenter->GetSegments().at(i)->GetNumKeypoints() > 5) // PARAM - minimum number of keypoints
+		{
+			FeatDescriptor * spin = new FeatDescriptor(std::string(argv[2]), std::string(argv[3]));
+			FileStr << Segmenter->GetLabels().at(i) << std::endl;
+			
+			spin->Compute(Segmenter->GetSegments().at(i)->GetCloud(), Segmenter->GetSegments().at(i)->GetKeypointIndices());
+			SpinImages.push_back(spin);
+		}
 	}
 
 	FileStr.close();
 
 	// Visualize stuff
-	int SegNum = 221;
+	int SegNum;
+	if(!argv[4])
+		SegNum = 401;
+	else
+		SegNum = atoi(argv[4]);
+	
 	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
-	pcl::visualization::PointCloudGeometryHandlerXYZ< PointWithScale > geometry(Segmenter->GetSegments().at(SegNum)->GetKeypointDetector()->GetKeypoints());
+	pcl::visualization::PointCloudGeometryHandlerXYZ<PointXYZRGB > geometry(Segmenter->GetSegments().at(SegNum)->GetKeypointDetector()->GetKeypoints());
 	viewer.addPointCloud(Segmenter->GetSegments().at(SegNum)->GetCloud(), "cloud");
 	viewer.addPointCloud(Segmenter->GetSegments().at(SegNum)->GetKeypointDetector()->GetKeypoints(), geometry, "keypoints");
 	viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, "keypoints");
