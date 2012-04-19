@@ -51,7 +51,7 @@ int main(int argc, char ** argv)
 		cout << i << " has num keypoints as " << Segmenter->GetSegments().at(i)->GetKeypointDetector()->GetKeypoints()->points.size() << endl;
 
 		// Compute features
-		if(Segmenter->GetSegments().at(i)->GetNumKeypoints() > 5) // PARAM - minimum number of keypoints
+		if(Segmenter->GetSegments().at(i)->GetNumKeypoints() > 1) // PARAM - minimum number of keypoints
 		{
 			FeatDescriptor * spin = new FeatDescriptor(std::string(argv[2]), std::string(argv[3]));
 			FileStr << Segmenter->GetLabels().at(i) << std::endl;
@@ -66,7 +66,7 @@ int main(int argc, char ** argv)
 	// Visualization stuff
 	int SegNum;
 	if(!argv[5])
-		SegNum = 401;
+		SegNum = 401; // PARAM - Just for example. Might overflow.
 	else
 		SegNum = atoi(argv[5]);
 
@@ -80,7 +80,7 @@ int main(int argc, char ** argv)
 		viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 0.0, 0.0, "keypoints");
 		viewer.spin();
 
-		while(!viewer.wasStopped()) {}	
+		while(!viewer.wasStopped()) {}
 	}
 
 	return 0;
