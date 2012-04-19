@@ -1,5 +1,4 @@
 #include <iostream>
-
 #include <pcl/visualization/cloud_viewer.h>
 
 #include "FeatPointCloud.hpp"
@@ -11,15 +10,20 @@
 using namespace std;
 using namespace pcl;
 
+bool isVisualize = false;
+
 int main(int argc, char ** argv)
 {
 	if(argc < 4)
 	{
-		cerr << "Incorrect number of input parameters. Usage: ./featextract <Input PCD File> <Output Feature File> <Config File> [<Segment number to visualize>]" << endl;
+		cerr << "Incorrect number of input parameters. Usage: ./featextract <Input PCD File> <Output Feature File> <Config File> [<Visualize? (Type anything)>] [<Segment number to visualize>]" << endl;
 		return -1;
 	}
-	// Create file if does not exist. Open it if it does
-	// Just clear the existing file
+	
+	if(argv[4])
+		isVisualize = true;
+
+	// Open new file ot just clear the existing file
 	FileStr.open(argv[2], ios::trunc);
 	if(FileStr.is_open())
 		FileStr.close();
@@ -42,9 +46,7 @@ int main(int argc, char ** argv)
 	cout << "Computing keypoints and features for segment..." << endl;
 	int NumSegments = Segmenter->GetSegments().size();
 	for(int i = 0; i < NumSegments; ++i)
-//	for(int i = 221; i < 222; ++i)
 	{
-//		cout << i+1 << endl;
 		Segmenter->GetSegments().at(i)->ComputeKeypoints();
 		cout << i << " has num keypoints as " << Segmenter->GetSegments().at(i)->GetKeypointDetector()->GetKeypoints()->points.size() << endl;
 
@@ -61,25 +63,26 @@ int main(int argc, char ** argv)
 
 	FileStr.close();
 
-	// Visualize stuff
+	// Visualization stuff
 	int SegNum;
-	if(!argv[4])
+	if(!argv[5])
 		SegNum = 401;
 	else
-		SegNum = atoi(argv[4]);
-	
-	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
-	pcl::visualization::PointCloudGeometryHandlerXYZ<PointXYZRGB > geometry(Segmenter->GetSegments().at(SegNum)->GetKeypointDetector()->GetKeypoints());
-	viewer.addPointCloud(Segmenter->GetSegments().at(SegNum)->GetCloud(), "cloud");
-	viewer.addPointCloud(Segmenter->GetSegments().at(SegNum)->GetKeypointDetector()->GetKeypoints(), geometry, "keypoints");
-	viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, "keypoints");
-	viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 0.0, 0.0, "keypoints");
-	viewer.spin();
+		SegNum = atoi(argv[5]);
 
-	while(!viewer.wasStopped()) {}	
+	if(isVisualize)
+	{
+		pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
+		pcl::visualization::PointCloudGeometryHandlerXYZ<PointXYZRGB > geometry(Segmenter->GetSegments().at(SegNum)->GetKeypointDetector()->GetKeypoints());
+		viewer.addPointCloud(Segmenter->GetSegments().at(SegNum)->GetCloud(), "cloud");
+		viewer.addPointCloud(Segmenter->GetSegments().at(SegNum)->GetKeypointDetector()->GetKeypoints(), geometry, "keypoints");
+		viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, "keypoints");
+		viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 0.0, 0.0, "keypoints");
+		viewer.spin();
 
+		while(!viewer.wasStopped()) {}	
+	}
 
 	return 0;
 }
-
 
