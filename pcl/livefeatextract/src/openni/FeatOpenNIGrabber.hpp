@@ -10,7 +10,7 @@
 class FeatOpenNIGrabber
 {
 	public:
-		FeatOpenNIGrabber(); : m_Viewer("FeatExtract PC Grabber") {}
+		FeatOpenNIGrabber();
 		void Run(void);
 
 	private:

@@ -19,7 +19,7 @@ void FeatSegment::BreakIntoSegments(void)
 	}
 
 	int NUMseg;
-	int NUMpts = m_SceneCloud->points.size (); // TODO change m_SceneCloud to PointXYZRGBCamSl
+	int NUMpts = m_SceneCloud->points.size();
 	NUMseg = m_SceneCloud->points[NUMpts - 1].segment;
 	std::cout << "Number of segments: " << NUMseg << std::endl;
 	
@@ -47,4 +47,5 @@ void FeatSegment::BreakIntoSegments(void)
 		m_Segments.push_back(Segment);
 	}
 }
+
 

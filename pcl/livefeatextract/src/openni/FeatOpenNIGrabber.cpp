@@ -6,9 +6,9 @@ FeatOpenNIGrabber::FeatOpenNIGrabber() :
 
 }
 
-void FeatOpenNIGrabber::ShowCloud(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr& Cloud)
+void FeatOpenNIGrabber::ShowCloud(const pcl::PointCloud<pcl::PointXYZRGBA >::ConstPtr& Cloud)
 {
-	if (!m_Viewer.wasStopped())
+	if(!m_Viewer.wasStopped())
 		m_Viewer.showCloud(Cloud);
 }
 
@@ -28,4 +28,3 @@ void FeatOpenNIGrabber::Run(void)
 
 	Interface->stop();
 }
-

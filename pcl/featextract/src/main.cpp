@@ -42,7 +42,6 @@ int main(int argc, char ** argv)
 	Segmenter->SetSceneCloud(WholeScene);
 	Segmenter->BreakIntoSegments();
 
-	vector<FeatDescriptor * > SpinImages;
 	cout << "Computing keypoints and features for segment..." << endl;
 	int NumSegments = Segmenter->GetSegments().size();
 	for(int i = 0; i < NumSegments; ++i)
@@ -51,13 +50,12 @@ int main(int argc, char ** argv)
 		cout << i << " has num keypoints as " << Segmenter->GetSegments().at(i)->GetKeypointDetector()->GetKeypoints()->points.size() << endl;
 
 		// Compute features
-		if(Segmenter->GetSegments().at(i)->GetNumKeypoints() > 3) // PARAM - minimum number of keypoints
+		if(Segmenter->GetSegments().at(i)->GetNumKeypoints() > 1) // PARAM - Also depends on SPINMinPts
 		{
 			FeatDescriptor * spin = new FeatDescriptor(std::string(argv[2]), std::string(argv[3]));
 			FileStr << Segmenter->GetLabels().at(i) << std::endl;
-			
 			spin->Compute(Segmenter->GetSegments().at(i)->GetCloud(), Segmenter->GetSegments().at(i)->GetKeypointIndices());
-			SpinImages.push_back(spin);
+			delete spin;
 		}
 	}
 
@@ -66,13 +64,13 @@ int main(int argc, char ** argv)
 	// Visualization stuff
 	int SegNum;
 	if(!argv[5])
-		SegNum = 401; // PARAM - Just for example. Might overflow.
+		SegNum = 210; // PARAM - Just for example. Might overflow.
 	else
 		SegNum = atoi(argv[5]);
 
 	if(isVisualize)
 	{
-		pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
+		pcl::visualization::PCLVisualizer viewer("Segment Cloud Viewer");
 		pcl::visualization::PointCloudGeometryHandlerXYZ<PointXYZRGB > geometry(Segmenter->GetSegments().at(SegNum)->GetKeypointDetector()->GetKeypoints());
 		viewer.addPointCloud(Segmenter->GetSegments().at(SegNum)->GetCloud(), "cloud");
 		viewer.addPointCloud(Segmenter->GetSegments().at(SegNum)->GetKeypointDetector()->GetKeypoints(), geometry, "keypoints");
