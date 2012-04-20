@@ -79,14 +79,6 @@ classdef MultiLayerPerceptron < handle
             new.allowSaving = obj.allowSaving;
         end
         
-        function obj = DoEverything(obj, trainingData, trainingLabels, quick)
-            % Automatically pretrains with model selection, trains softmax,
-            % and finetunes the network.
-            obj.PretrainModelSelection(trainingData, trainingLabels, [], quick);
-            obj.TrainSoftmax(trainingData, trainingLabels);
-            obj.FineTune(trainingData, trainingLabels, quick);
-        end
-        
         function obj = Pretrain(obj, pretrainData, quick, sparsityParameters, lambdaParameters, betaParameters)
             % Pretrains the layers given specific hyperparameters
             % or using defaults if not specified

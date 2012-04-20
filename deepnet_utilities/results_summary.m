@@ -16,6 +16,8 @@ function [ ] = results_summary( taskName, performanceMeasure )
     finetuneCount = 0;
     externalraw = cell(0,4); % gsvm, lsvm, msvm, sm
     externalrawCount = 0;
+    externalfinetuned = cell(0,8); % ft/pft(gsvm, lsvm, msvm, sm)
+    externalfinetunedCount = 0;
     
     prospects = ls([rawData '*']);
     for ii = 1:size(prospects,1)
@@ -35,13 +37,27 @@ function [ ] = results_summary( taskName, performanceMeasure )
             externalraw{externalrawCount,3} = msvm;
             externalraw{externalrawCount,4} = sm;
         end
+        
+        externalfinetunedPath = generate_read_file_path({'tasks', 'output', 'externalfinetuned'}, prospects(ii,:));
+        load(externalfinetunedPath);
+        if strcmp(masterTaskName, taskName)
+            externalfinetunedCount = externalfinetunedCount + 1;
+            externalfinetuned{externalfinetunedCount,1} = ftgsvm;
+            externalfinetuned{externalfinetunedCount,2} = ftlsvm;
+            externalfinetuned{externalfinetunedCount,3} = ftmsvm;
+            externalfinetuned{externalfinetunedCount,4} = ftsm;
+            externalfinetuned{externalfinetunedCount,5} = pftgsvm;
+            externalfinetuned{externalfinetunedCount,6} = pftlsvm;
+            externalfinetuned{externalfinetunedCount,7} = pftmsvm;
+            externalfinetuned{externalfinetunedCount,8} = pftsm;
+        end
     end
     
     display_externals(externalraw, performanceMeasure);
     display_finetune(finetune, performanceMeasure);
+    display_externalfinetuned(externalfinetuned, performanceMeasure);
 
 end
-
 
 function display_externals(externalraw, performanceMeasure)
     gsvm = average_field(externalraw(:,1), performanceMeasure)
@@ -54,6 +70,36 @@ function display_externals(externalraw, performanceMeasure)
     max_sm   = max(max(sm))
 end
 
+function display_externalfinetuned(externalfinetuned, performanceMeasure)
+    for layer = 1:length(externalfinetuned{1,1})
+        fprintf('---------------- LAYER %i ------------------\n\n', layer);
+        ftgsvm = average_field_layer(externalfinetuned(:,1), performanceMeasure, layer)
+        ftlsvm = average_field_layer(externalfinetuned(:,2), performanceMeasure, layer)
+        ftmsvm = average_field_layer(externalfinetuned(:,3), performanceMeasure, layer)
+        ftsm   = average_field_layer(externalfinetuned(:,4), performanceMeasure, layer)
+        pftgsvm = average_field_layer(externalfinetuned(:,5), performanceMeasure, layer)
+        pftlsvm = average_field_layer(externalfinetuned(:,6), performanceMeasure, layer)
+        pftmsvm = average_field_layer(externalfinetuned(:,7), performanceMeasure, layer)
+        pftsm   = average_field_layer(externalfinetuned(:,8), performanceMeasure, layer)
+        max_ftgsvm = max(max(ftgsvm))
+        max_ftlsvm = max(max(ftlsvm))
+        max_ftmsvm = max(max(ftmsvm))
+        max_ftsm   = max(max(ftsm))
+        max_pftgsvm = max(max(pftgsvm))
+        max_pftlsvm = max(max(pftlsvm))
+        max_pftmsvm = max(max(pftmsvm))
+        max_pftsm   = max(max(pftsm))
+    end
+end
+
+function result = average_field_layer(cellstruct, field, layer)
+    total = retrieve_cellstruct_field(cellstruct{1}{layer}, field);
+    assert(size(cellstruct,2) == 1, 'Must be nx1 cell struct array');
+    for ii = 2:size(cellstruct,1)
+        total = total + retrieve_cellstruct_field(cellstruct{ii}{layer}, field);
+    end
+    result = total / size(cellstruct,1);
+end
 
 function display_finetune(finetune, performanceMeasure)
     performanceMeasure(1) = upper(performanceMeasure(1));
