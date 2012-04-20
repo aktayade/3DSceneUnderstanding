@@ -1,18 +1,20 @@
-function [ tunedStack, tunedSoftmax ] = fineTuneStackedAutoencoder(stack, softmaxModel, numClasses, data, labels, maxIter)
+function [ tunedStack, tunedSoftmax ] = fineTuneStackedAutoencoder(stack, softmaxModel, numClasses, data, labels, lambda, maxIter)
 %FINETUNESTACKEDAUTOENCODER Takes a pretrained stacked autoencoder and runs
 % backpropagation to fine tune it.
 
     if ~exist('maxIter', 'var')
         maxIter = 400;
     end
+    if ~exist('lambda', 'var')
+        lambda = 1e-3;  % For the softmax classifier regularization only
+    end
 
     stackedAETheta = compressParameters(stack, softmaxModel.optTheta);
     
-    globalPaths;
+    deeplearnGlobalPaths;
     options.Method = 'lbfgs';
     options.maxIter = maxIter;
     options.display = 'on';
-    lambda = 1e-4; % For the softmax classifier regularization only
     [theta, ~] = minFunc( @(p) stackedAECost(p, stack, numClasses, lambda, data, labels),...
                                     stackedAETheta, options);
 

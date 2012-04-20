@@ -1,4 +1,4 @@
-function [W, hbias, vbias, pars, stats] = rbm_train_LB_hinton(X, numhid, pbias, l2reg, pbias_lambda, maxiter, epsilon, gibbsteps, opt_GPU)
+function [W, hbias, vbias, pars, stats] = rbm_train_LB_hinton(X, numhid, pbias, l2reg, pbias_lambda, maxiter, givenLabel, givenCenter, epsilon, gibbsteps, opt_GPU)
 % This code tries to estimate sigma 
 % The energy function used:
 % E(v,h) = 1/2*(v-c).^2 - 1/sigma (v'Wh + b'h)
@@ -40,12 +40,19 @@ batch_size = 100;
 if exist('./litekmeans/', 'dir')
     addpath ./litekmeans/
 end
-opt_approx = false; %true;
-if opt_approx
-    [label,center] = litekmeans(X', min(numhid,500), true, 100);
+%opt_approx = false; %true;
+%if opt_approx
+%    [label,center] = litekmeans(X', min(numhid,500), true, 100);
+%else
+%    %[label,center] = litekmeans(X', numhid, true, 200);
+%    [label,center] = kmeans(X', numhid, 'Replicates', 1, 'EmptyAction', 'singleton'); %200
+%end
+
+if exist('givenLabel', 'var') && exist('givenCenter', 'var')
+    label = givenLabel;
+    center = givenCenter;
 else
-    %[label,center] = litekmeans(X', numhid, true, 200);
-    [label,center] = kmeans(X', numhid, 'Replicates', 40); %200
+    [label,center] = kmeans(X', numhid, 'Replicates', 1, 'EmptyAction', 'singleton'); %200
 end
 
 center = center'; % now, center= dim*centroids 

@@ -1,39 +1,48 @@
-classdef LayerBinaryAutoencoder < LayerBase
-    %LAYERBINARYAUTOENCODER Represents a layer of deterministic binary
-    %   units in the network whose input is [0,1] and output is [0,1]
+classdef LayerGaussianRBM < LayerBase
+    %LAYERGAUSSIANRBM Represents a layer of stochastic linear
+    %   units in the network whose input is continuous and output is binary
     
     properties (Constant)
-        defaultSparsity = 0.01;
-        defaultLambda = 0.0001;
-        defaultBeta = 3;
-        quickPretrainMaxIter = 200;
-        fullPretrainMaxIter = 400;
+        defaultSparsity = 0.02;
+        defaultLambda = 0.001;
+        defaultBeta = 10;
+        quickPretrainMaxIter = 250;
+        fullPretrainMaxIter = 250;
+    end
+    
+    properties
+        label
+        center
     end
     
     methods
-        function obj = LayerBinaryAutoencoder(hiddenSize)
+        function obj = LayerGaussianRBM(hiddenSize)
             obj.hiddenSize = hiddenSize;
             obj.W = [];
             obj.b = [];
             obj.pretrained = false;
             obj.optimalParameters = [];
             obj.modelSelectionWork = [];
-            obj.quickModelSelect = false;
+            obj.label = zeros(0,1);
+            obj.center = zeros(0,1);
         end
         
         function new = Clone(obj)
-            new = LayerBinaryAutoencoder(obj.hiddenSize);
+            new = LayerGaussianRBM(obj.hiddenSize);
             new.W = obj.W;
             new.b = obj.b;
             new.pretrained = obj.pretrained;
             new.optimalParameters = obj.optimalParameters;
             new.modelSelectionWork = obj.modelSelectionWork;
-            new.quickModelSelect = obj.quickModelSelect;
         end
         
         function obj = Pretrain(obj, data, sparsityParam, lambda, beta, quick)
             maxIter = obj.quickPretrainMaxIter*quick + obj.fullPretrainMaxIter*~quick;
-            [obj.W, obj.b] = pretrainBinarySparseAutoencoder(data, obj.hiddenSize, sparsityParam, lambda, beta, maxIter);
+            if isempty(obj.center)
+                [obj.W, obj.b] = rbm_train_LB_hinton(data, obj.hiddenSize, sparsityParam, lambda, beta, maxIter);
+            else
+                [obj.W, obj.b] = rbm_train_LB_hinton(data, obj.hiddenSize, sparsityParam, lambda, beta, maxIter, obj.label, obj.center);
+            end
             obj.pretrained = true;
         end
         
@@ -50,9 +59,19 @@ classdef LayerBinaryAutoencoder < LayerBase
                 {linspace(1/obj.hiddenSize, 30/obj.hiddenSize, N)};
                 {obj.defaultLambda};
                 {obj.defaultBeta}];
-            startPoint = zeros(size(paramSpace));
+            startPoint = zeros(size(paramSpace))';
             for d = 1:length(paramSpace)
                 startPoint(d) = mean(paramSpace{d},2);
+            end
+        end
+        
+        function obj = SetKMeansClusters(obj, label, center)
+            if nargin < 3
+                obj.label = zeros(0,1);
+                obj.center = zeros(0,1);
+            else
+                obj.label = label;
+                obj.center = center;
             end
         end
     end

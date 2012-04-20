@@ -1,39 +1,37 @@
-classdef LayerLinearAutoencoder < LayerBase
-    %LAYERLINEARAUTOENCODER Represents a layer of deterministic linear
-    %   units in the network whose input is continuous and output is binary
+classdef LayerBinaryAutoencoder < LayerBase
+    %LAYERBINARYAUTOENCODER Represents a layer of deterministic binary
+    %   units in the network whose input is [0,1] and output is [0,1]
     
     properties (Constant)
-        defaultSparsity = 0.035;
-        defaultLambda = 3e-3;
-        defaultBeta = 5;
+        defaultSparsity = 0.01;
+        defaultLambda = 0.0001;
+        defaultBeta = 3;
         quickPretrainMaxIter = 200;
         fullPretrainMaxIter = 400;
     end
     
     methods
-        function obj = LayerLinearAutoencoder(hiddenSize)
+        function obj = LayerBinaryAutoencoder(hiddenSize)
             obj.hiddenSize = hiddenSize;
             obj.W = [];
             obj.b = [];
             obj.pretrained = false;
             obj.optimalParameters = [];
             obj.modelSelectionWork = [];
-            obj.quickModelSelect = false;
         end
         
         function new = Clone(obj)
-            new = LayerLinearAutoencoder(obj.hiddenSize);
+            new = LayerBinaryAutoencoder(obj.hiddenSize);
             new.W = obj.W;
             new.b = obj.b;
             new.pretrained = obj.pretrained;
             new.optimalParameters = obj.optimalParameters;
             new.modelSelectionWork = obj.modelSelectionWork;
-            new.quickModelSelect = obj.quickModelSelect;
         end
         
         function obj = Pretrain(obj, data, sparsityParam, lambda, beta, quick)
             maxIter = obj.quickPretrainMaxIter*quick + obj.fullPretrainMaxIter*~quick;
-            [obj.W, obj.b] = pretrainLinearSparseAutoencoder(data, obj.hiddenSize, sparsityParam, lambda, beta, maxIter);
+            [obj.W, obj.b] = pretrainBinarySparseAutoencoder(data, obj.hiddenSize, sparsityParam, lambda, beta, maxIter);
             obj.pretrained = true;
         end
         
@@ -50,7 +48,7 @@ classdef LayerLinearAutoencoder < LayerBase
                 {linspace(1/obj.hiddenSize, 30/obj.hiddenSize, N)};
                 {obj.defaultLambda};
                 {obj.defaultBeta}];
-            startPoint = zeros(size(paramSpace));
+            startPoint = zeros(size(paramSpace))';
             for d = 1:length(paramSpace)
                 startPoint(d) = mean(paramSpace{d},2);
             end

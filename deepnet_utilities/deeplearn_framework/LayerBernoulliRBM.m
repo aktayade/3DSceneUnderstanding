@@ -1,5 +1,5 @@
-classdef LayerGaussianRBM < LayerBase
-    %LAYERGAUSSIANRBM Represents a layer of stochastic linear
+classdef LayerBernoulliRBM < LayerBase
+    %LAYERBERNOULLIRBM Represents a layer of stochastic binary
     %   units in the network whose input is continuous and output is binary
     
     properties (Constant)
@@ -11,29 +11,27 @@ classdef LayerGaussianRBM < LayerBase
     end
     
     methods
-        function obj = LayerGaussianRBM(hiddenSize)
+        function obj = LayerBernoulliRBM(hiddenSize)
             obj.hiddenSize = hiddenSize;
             obj.W = [];
             obj.b = [];
             obj.pretrained = false;
             obj.optimalParameters = [];
             obj.modelSelectionWork = [];
-            obj.quickModelSelect = false;
         end
         
         function new = Clone(obj)
-            new = LayerGaussianRBM(obj.hiddenSize);
+            new = LayerBernoulliRBM(obj.hiddenSize);
             new.W = obj.W;
             new.b = obj.b;
             new.pretrained = obj.pretrained;
             new.optimalParameters = obj.optimalParameters;
             new.modelSelectionWork = obj.modelSelectionWork;
-            new.quickModelSelect = obj.quickModelSelect;
         end
         
         function obj = Pretrain(obj, data, sparsityParam, lambda, beta, quick)
             maxIter = obj.quickPretrainMaxIter*quick + obj.fullPretrainMaxIter*~quick;
-            [obj.W, obj.b] = rbm_train_LB_hinton(data, obj.hiddenSize, sparsityParam, lambda, beta, maxIter);
+            [obj.W, obj.b] = rbm_train_BB_hinton(data, obj.hiddenSize, sparsityParam, lambda, beta, maxIter);
             obj.pretrained = true;
         end
         
@@ -50,7 +48,7 @@ classdef LayerGaussianRBM < LayerBase
                 {linspace(1/obj.hiddenSize, 30/obj.hiddenSize, N)};
                 {obj.defaultLambda};
                 {obj.defaultBeta}];
-            startPoint = zeros(size(paramSpace));
+            startPoint = zeros(size(paramSpace))';
             for d = 1:length(paramSpace)
                 startPoint(d) = mean(paramSpace{d},2);
             end

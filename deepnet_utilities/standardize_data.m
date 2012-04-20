@@ -1,4 +1,4 @@
-function [data,dataMean,dataStd] = StandardizeData(data,dataMean,dataStd)
+function [data,dataMean,dataStd] = standardize_data(data,dataMean,dataStd)
 % STANDARDIZE_DATA Will normalize and center a dataset.
 %   Optionally, give it a mean and std to use to standardize the
 %   data.

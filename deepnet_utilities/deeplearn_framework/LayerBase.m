@@ -8,7 +8,6 @@ classdef LayerBase < handle
         pretrained
         optimalParameters
         modelSelectionWork
-        quickModelSelect
     end
     
     methods (Abstract)

@@ -18,7 +18,7 @@ visibleSize = size(data,1);
 theta = initializeParameters(hiddenSize, visibleSize);
 
 %  Use minFunc to minimize the function
-globalPaths;
+deeplearnGlobalPaths;
 options.Method = 'lbfgs';
 options.maxIter = maxIter;
 options.display = 'on';
