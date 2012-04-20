@@ -22,11 +22,11 @@ classdef MultiLayerPerceptron < handle
     end
     
     methods
-        function obj = MultiLayerPerceptron(name, hiddenLayers, numClasses, binaryInput, useRBMs, noLoadExisting)
+        function obj = MultiLayerPerceptron(name, hiddenLayers, numClasses, inputType, useRBMs, noLoadExisting)
             % name is the name of the network (for saving/loading)
             % hiddenLayers is a vector with each hiddenLayer size
             % numClasses is the total number of labels in the test data
-            % binaryInput is true if the first layer is [0,1], else false
+            % inputType is B, C, or P
             % useRBMs is true if RBMs should be used for pretraining
             %   instead of deterministic autoencoders
             % noLoadExisting is false to allow loading existing net
@@ -50,14 +50,29 @@ classdef MultiLayerPerceptron < handle
             
             % Build the network
             for l = 1:length(hiddenLayers)
-                if l == 1 && ~binaryInput && useRBMs
-                    obj.layers{l} = LayerGaussianRBM(hiddenLayers(l));
-                elseif l == 1 && ~binaryInput && ~useRBMs
-                    obj.layers{l} = LayerLinearAutoencoder(hiddenLayers(l));
-                elseif useRBMs
-                    obj.layers{l} = LayerBernoulliRBM(hiddenLayers(l));
-                else
-                    obj.layers{l} = LayerBinaryAutoencoder(hiddenLayers(l));
+                switch(lower(inputType))
+                    case 'c'
+                        if l == 1 && useRBMs
+                            obj.layers{l} = LayerGaussianRBM(hiddenLayers(l));
+                        elseif l == 1
+                            obj.layers{l} = LayerLinearAutoencoder(hiddenLayers(l));
+                        elseif useRBMs
+                            obj.layers{l} = LayerBernoulliRBM(hiddenLayers(l));
+                        else
+                            obj.layers{l} = LayerBinaryAutoencoder(hiddenLayers(l));
+                        end
+                    case 'b'
+                        if useRBMs
+                            obj.layers{l} = LayerBernoulliRBM(hiddenLayers(l));
+                        else
+                            obj.layers{l} = LayerBinaryAutoencoder(hiddenLayers(l));
+                        end
+                    case 'p'
+                        if useRBMs
+                            obj.layers{l} = LayerPoissonRBM(hiddenLayers(l));
+                        else
+                            error('Poisson autoencoder not supported');
+                        end
                 end
             end
             obj.numClasses = numClasses;

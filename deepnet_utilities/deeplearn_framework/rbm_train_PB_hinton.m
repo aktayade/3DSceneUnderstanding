@@ -61,6 +61,7 @@ sparsity_history = [];
 %fname_png = sprintf('%s.png', fname_save);
 
 % train a restricted Boltzmann machine
+runningavg_prob = [];
 for t=1:maxiter
     tic
     randidx = randperm(size(X,2));
