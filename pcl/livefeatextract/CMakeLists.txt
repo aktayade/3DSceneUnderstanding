@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8 FATAL_ERROR)
 
 ########### Project name ###########
-SET(PACKAGE featextract)
+SET(PACKAGE livefeatextract)
 PROJECT(${PACKAGE})
 
 ########### Find packages ###########

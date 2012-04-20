@@ -49,7 +49,7 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 	m_NormalEstimator.setInputCloud(Cloud);
 	m_NormalEstimator.setSearchMethod(m_KdTree);
 
-	m_NormalEstimator.setRadiusSearch(m_NormalEstRadius); // PARAM - Using 1cm for now (just like the Cornell guys)
+	m_NormalEstimator.setRadiusSearch(m_NormalEstRadius);
 	m_NormalEstimator.compute(*m_Normals);
 	// std::cout << "Number of indices in normal estimation: " << m_NormalEstimator.getIndices()->size() << std::std::endl;
 
@@ -77,7 +77,7 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 			{
 				if(i == 0)
 					FileStr << "(";
-				if(i == M_HISTGRAM_BINS-1)
+				if(i == M_HISTGRAM_BINS - 1)
 				{
 					FileStr << feat_line.histogram[i] << ")" << std::endl;
 					continue;

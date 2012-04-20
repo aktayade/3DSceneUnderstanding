@@ -1,9 +1,9 @@
 
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/core)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/core ${CMAKE_SOURCE_DIR}/src/openni)
 
 # To use all *.cpp and *.hpp
-FILE(GLOB ALL_HEADER_FILES *.hpp core/*.hpp)
-FILE(GLOB ALL_CPP_FILES *.cpp core/*.cpp)
+FILE(GLOB ALL_HEADER_FILES *.hpp core/*.hpp openni/*.hpp)
+FILE(GLOB ALL_CPP_FILES *.cpp core/*.cpp openni/*.cpp)
 
 SET(SRCS
 	${ALL_HEADER_FILES}
@@ -13,6 +13,6 @@ SET(SRCS
 SET(extLinkerOption ${PCL_LIBRARIES})
 #SET(extLinkerOption ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} ${PCL_<>_LIBRARIES})
 
-ADD_EXECUTABLE(featextract ${SRCS})
-TARGET_LINK_LIBRARIES(featextract ${extLinkerOption})
+ADD_EXECUTABLE(livefeatextract ${SRCS})
+TARGET_LINK_LIBRARIES(livefeatextract ${extLinkerOption})
 
