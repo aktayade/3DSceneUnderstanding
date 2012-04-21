@@ -46,10 +46,10 @@ function result = multiSvmPerformance(params, xtrain, ytrain, xtest, ytest, numC
 
     assert(size(ytrain,1) > 1, 'training vector dimensions swapped');
     
-    train_data_filename = tempname('.');
-    test_data_filename = tempname('.');
-    test_predict_filename = tempname('.');
-    model_filename = tempname('.');
+    train_data_filename = tempname;
+    test_data_filename = tempname;
+    test_predict_filename = tempname;
+    model_filename = tempname;
     
     f = fopen(train_data_filename, 'w');
     for ii = 1:size(xtrain,1)
@@ -71,8 +71,15 @@ function result = multiSvmPerformance(params, xtrain, ytrain, xtest, ytest, numC
     end
     fclose(f);
 
-    system(sprintf('.\\ExternalClassifiers\\svm_multiclass_learn.exe -c %f %s %s', c, train_data_filename, model_filename));
-    system(sprintf('.\\ExternalClassifiers\\svm_multiclass_classify.exe %s %s %s', test_data_filename, model_filename, test_predict_filename));
+    % Hack for caen machines. Assumes executables have been copied to temp
+    if strfind(pwd, '\\storage.adsroot.itcs.umich.edu')
+        temppath = fileparts(tempname);
+        system(sprintf('%s\\svm_multiclass_learn.exe -c %f %s %s', temppath, c, train_data_filename, model_filename));
+        system(sprintf('%s\\svm_multiclass_classify.exe %s %s %s', temppath, test_data_filename, model_filename, test_predict_filename));
+    else
+        system(sprintf('.\\ExternalClassifiers\\svm_multiclass_learn.exe -c %f %s %s', c, train_data_filename, model_filename));
+        system(sprintf('.\\ExternalClassifiers\\svm_multiclass_classify.exe %s %s %s', test_data_filename, model_filename, test_predict_filename));
+    end
     
     predictions = load(test_predict_filename);
     class = predictions(:, 1);

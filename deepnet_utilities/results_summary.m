@@ -24,7 +24,7 @@ function [ ] = results_summary( taskName, performanceMeasure )
         prospects(ii,:)
         finetunedPath = generate_read_file_path({'tasks', 'output', 'finetuned'}, prospects(ii,:));
         if ~exist(finetunedPath, 'file')
-            fprintf('Failed to open %s\n', finetunedPath);
+            fprintf('Missing file: %s\n', finetunedPath);
         else
             load(finetunedPath);
             if strcmp(masterTaskName, taskName)
@@ -49,7 +49,7 @@ function [ ] = results_summary( taskName, performanceMeasure )
         end
         externalfinetunedPath = generate_read_file_path({'tasks', 'output', 'externalfinetuned'}, prospects(ii,:));
         if ~exist(externalfinetunedPath, 'file')
-            fprintf('Failed to open %s\n', externalfinetunedPath);
+            fprintf('Missing file: %s\n', externalfinetunedPath);
         else
             load(externalfinetunedPath);
             if strcmp(masterTaskName, taskName)
