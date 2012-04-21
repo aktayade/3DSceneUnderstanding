@@ -7,20 +7,23 @@
 
 static std::ofstream FileStr;
 
-struct PointXYZRGBCamSL {
-  PCL_ADD_POINT4D;
-  
-  union {
-    struct {
-      float rgb;
-    };
-    float data_c[4];
-  };
-  uint32_t cameraIndex;
-  float distance;
-  uint32_t segment;
-  uint32_t label;
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+struct PointXYZRGBCamSL
+{
+	PCL_ADD_POINT4D;
+
+	union
+	{
+		struct
+		{
+		  float rgb;
+		};
+		float data_c[4];
+	};
+	uint32_t cameraIndex;
+	float distance;
+	uint32_t segment;
+	uint32_t label;
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(
