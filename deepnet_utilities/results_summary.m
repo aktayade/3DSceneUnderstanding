@@ -21,41 +21,62 @@ function [ ] = results_summary( taskName, performanceMeasure )
     
     prospects = ls([rawData '*']);
     for ii = 1:size(prospects,1)
-        finetunedPath = generate_read_file_path({'tasks', 'output', 'finetuned'}, prospects(ii,:));
-        load(finetunedPath);
-        if strcmp(masterTaskName, taskName)
-            finetuneCount = finetuneCount + 1;
-            finetune{finetuneCount,1} = work;
-        end
         prospects(ii,:)
-        externalrawPath = generate_read_file_path({'tasks', 'output', 'externalraw'}, prospects(ii,:));
-        load(externalrawPath);
-        if strcmp(masterTaskName, taskName)
-            externalrawCount = externalrawCount + 1;
-            externalraw{externalrawCount,1} = gsvm;
-            externalraw{externalrawCount,2} = lsvm;
-            externalraw{externalrawCount,3} = msvm;
-            externalraw{externalrawCount,4} = sm;
+        finetunedPath = generate_read_file_path({'tasks', 'output', 'finetuned'}, prospects(ii,:));
+        if ~exist(finetunedPath, 'file')
+            fprintf('Failed to open %s\n', finetunedPath);
+        else
+            load(finetunedPath);
+            if strcmp(masterTaskName, taskName)
+                finetuneCount = finetuneCount + 1;
+                finetune{finetuneCount,1} = work;
+            end
         end
         
+        
+        externalrawPath = generate_read_file_path({'tasks', 'output', 'externalraw'}, prospects(ii,:));
+        if ~exist(externalrawPath, 'file')
+            fprintf('Failed to open %s\n', externalrawPath);
+        else
+            load(externalrawPath);
+            if strcmp(masterTaskName, taskName)
+                externalrawCount = externalrawCount + 1;
+                externalraw{externalrawCount,1} = gsvm;
+                externalraw{externalrawCount,2} = lsvm;
+                externalraw{externalrawCount,3} = msvm;
+                externalraw{externalrawCount,4} = sm;
+            end
+        end
         externalfinetunedPath = generate_read_file_path({'tasks', 'output', 'externalfinetuned'}, prospects(ii,:));
-        load(externalfinetunedPath);
-        if strcmp(masterTaskName, taskName)
-            externalfinetunedCount = externalfinetunedCount + 1;
-            externalfinetuned{externalfinetunedCount,1} = ftgsvm;
-            externalfinetuned{externalfinetunedCount,2} = ftlsvm;
-            externalfinetuned{externalfinetunedCount,3} = ftmsvm;
-            externalfinetuned{externalfinetunedCount,4} = ftsm;
-            externalfinetuned{externalfinetunedCount,5} = pftgsvm;
-            externalfinetuned{externalfinetunedCount,6} = pftlsvm;
-            externalfinetuned{externalfinetunedCount,7} = pftmsvm;
-            externalfinetuned{externalfinetunedCount,8} = pftsm;
+        if ~exist(externalfinetunedPath, 'file')
+            fprintf('Failed to open %s\n', externalfinetunedPath);
+        else
+            load(externalfinetunedPath);
+            if strcmp(masterTaskName, taskName)
+                externalfinetunedCount = externalfinetunedCount + 1;
+                externalfinetuned{externalfinetunedCount,1} = ftgsvm;
+                externalfinetuned{externalfinetunedCount,2} = ftlsvm;
+                externalfinetuned{externalfinetunedCount,3} = ftmsvm;
+                externalfinetuned{externalfinetunedCount,4} = ftsm;
+                externalfinetuned{externalfinetunedCount,5} = pftgsvm;
+                externalfinetuned{externalfinetunedCount,6} = pftlsvm;
+                externalfinetuned{externalfinetunedCount,7} = pftmsvm;
+                externalfinetuned{externalfinetunedCount,8} = pftsm;
+            end
         end
     end
     
-    display_externals(externalraw, performanceMeasure);
-    display_finetune(finetune, performanceMeasure);
-    display_externalfinetuned(externalfinetuned, performanceMeasure);
+    if externalrawCount > 0
+        display_externals(externalraw, performanceMeasure);
+    end
+    
+    if finetuneCount > 0
+        display_finetune(finetune, performanceMeasure);
+    end
+    
+    if externalfinetunedCount > 0
+        display_externalfinetuned(externalfinetuned, performanceMeasure);
+    end
 
 end
 

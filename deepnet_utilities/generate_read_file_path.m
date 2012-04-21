@@ -7,13 +7,13 @@ function [path] = generate_read_file_path(folders, file, varargin)
     if isa(folders, 'cell') && ~isempty(folders)
         folderPath = folders{1};
         for ii = 2:length(folders)
-            folderPath = [folderPath '\' folders{ii}];
+            folderPath = [folderPath '/' folders{ii}];
         end
-        folderPath = [folderPath '\'];
+        folderPath = [folderPath '/'];
     elseif isempty(folders)
         folderPath = '';
     else
-        folderPath = [folders '\'];
+        folderPath = [folders '/'];
     end
 
     finalFileName = file;

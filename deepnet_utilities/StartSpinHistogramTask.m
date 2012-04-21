@@ -5,8 +5,8 @@ data = DATA';
 labels = LABEL';
 
 taskName = 'spinhistograms';
-set_task_parameters(taskName, 'hiddenLayers', [200 200 200], 'binaryInput', true, 'useRBMs', true, 'modelSelectDensity', 10, 'modelSelectKFolds', 4);
-create_cross_validated_task(taskName, data, labels, 4);
+set_task_parameters(taskName, 'hiddenLayers', [400 300 200], 'inputType', 'p', 'useRBMs', true, 'modelSelectDensity', 10, 'modelSelectKFolds', 4);
+create_cross_validated_task(taskName, data, labels, 4, [], false);
 
 % stage_model_select_pretrain('', true);
 % stage_finetune('', true);

@@ -9,5 +9,6 @@ function [data,dataMean,dataStd] = standardize_data(data,dataMean,dataStd)
     n = size(data,2);
     data = (data - repmat(dataMean, 1, n)) ./ repmat(dataStd, 1, n);
     data(isnan(data)) = 0;
+    data(isinf(data)) = 0;
 end
 

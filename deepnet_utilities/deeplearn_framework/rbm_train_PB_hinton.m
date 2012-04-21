@@ -1,5 +1,6 @@
 function [W, hbias, vbias, pars, stats] = rbm_train_PB_hinton(X, numhid, pbias, l2reg, pbias_lambda, maxiter, epsilon, gibbsteps)
-% Note that this is a poisson version:
+% Note that this is a constrained poisson version:
+%       Histogram data is expected to be NORMALIZED (dimensions sum to 1)
 % When turning off sparsity, just use pbias=0, pbias_lambda=0;
 
 % TODO: implement GPU version
@@ -78,7 +79,11 @@ for t=1:maxiter
 
         %negdata = sigmoid(1/sigma*(W*poshidstates + repmat(vbias, 1, size(Xb,2))));
         %neghidprob = sigmoid(1/sigma*(W'*negdata + repmat(hbias, 1, size(Xb,2))));
-        negdata = exp(W*poshidstates + repmat(vbias, 1, size(Xb,2)));
+        
+        % Normalized
+        poissonExpectation = exp(W*poshidstates + repmat(vbias, 1, size(Xb,2)));
+        negdata = poissonExpectation ./ repmat(sum(poissonExpectation), size(Xb,1), 1);
+        
         neghidprob = sigmoid(1/sigma*(W'*negdata + repmat(hbias, 1, size(Xb,2))));
         
         if gibbsteps > 1
@@ -88,7 +93,10 @@ for t=1:maxiter
                 %poshidprob = sigmoid(1/sigma*(W'*negdata2 + repmat(hbias, 1, size(Xb,2))));
                 poshidstates = rand(size(neghidprob))< neghidprob;
 
-                negdata2 = exp(W*poshidstates + repmat(vbias, 1, size(Xb,2)));
+                % Normalized
+                poissonExpectation = exp(W*poshidstates + repmat(vbias, 1, size(Xb,2)));
+                negdata2 = poissonExpectation ./ repmat(sum(poissonExpectation), size(Xb,1), 1);
+        
                 neghidprob = sigmoid(1/sigma*(W'*negdata2 + repmat(hbias, 1, size(Xb,2))));
             end
         end

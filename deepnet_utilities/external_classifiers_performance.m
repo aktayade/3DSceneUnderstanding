@@ -46,10 +46,10 @@ function result = multiSvmPerformance(params, xtrain, ytrain, xtest, ytest, numC
 
     assert(size(ytrain,1) > 1, 'training vector dimensions swapped');
     
-    train_data_filename = tempname;
-    test_data_filename = tempname;
-    test_predict_filename = tempname;
-    model_filename = tempname;
+    train_data_filename = tempname('.');
+    test_data_filename = tempname('.');
+    test_predict_filename = tempname('.');
+    model_filename = tempname('.');
     
     f = fopen(train_data_filename, 'w');
     for ii = 1:size(xtrain,1)

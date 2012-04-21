@@ -5,7 +5,7 @@ function [ ] = stage_model_select_pretrain( taskName, stayActive, target )
 %  pretrains  only runs for that target then exits
 % Stage task parameters:
 %   hiddenLayers - matrix representing the hidden layer counts in the MLP
-%   binaryInput - true if data is in the range [0,1]. False otherwise.
+%   inputType - b, c, or p for binary, continuous, or poisson
 %   useRBMs - true to use RBMs instead of autoencoder networks
 %   modelSelectDensity - [opt] determines how many search values are tried
 %   modelSelectKFolds - [opt] how many folds to use in model selection CV
@@ -49,14 +49,14 @@ function [mlp] = pretrain(xtrain, ytrain, unlabeled, taskName)
     if ~isfield(task, 'hiddenLayers')
         error('Must define task parameter hiddenLayers');
     end
-    if ~isfield(task, 'binaryInput')
-        error('Must define task parameter binaryInput');
+    if ~isfield(task, 'inputType')
+        error('Must define task parameter inputType');
     end
     if ~isfield(task, 'useRBMs')
         error('Must define task parameter useRBMs');
     end
 
-    mlp = MultiLayerPerceptron(taskName, task.hiddenLayers, task.numClasses, task.binaryInput, task.useRBMs, true);
+    mlp = MultiLayerPerceptron(taskName, task.hiddenLayers, task.numClasses, task.inputType, task.useRBMs, true);
     
     for l = 1:length(mlp.layers)
         if ~mlp.layers{l}.pretrained
