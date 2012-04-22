@@ -1,2 +1,1 @@
-1. Try using the SVM on only the features extracted by the DBN
-2. Now try using the SVM on both the original features and the features extracted by the DBN
+1. Try adding color information to the SPIN image features. This might improve things.
