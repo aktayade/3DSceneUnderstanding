@@ -97,6 +97,78 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 	return true;
 }
 
+bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<int > Indices, std::vector<float > SegmentFeat, const int& SegmentLabel)
+{
+	if(SegmentLabel != int(SegmentFeat.at(2))) // Check for label correspondence
+	{
+		std::cerr << "[FATAL]: Spin images not aligned with I+S features! Check logic." << std::endl;
+		return false;
+	}
+
+	IndicesPtr indicesptr(new std::vector<int> (Indices));
+
+	m_NormalEstimator.setInputCloud(Cloud);
+	m_NormalEstimator.setSearchMethod(m_KdTree);
+
+	m_NormalEstimator.setRadiusSearch(m_NormalEstRadius);
+	m_NormalEstimator.compute(*m_Normals);
+	// std::cout << "Number of indices in normal estimation: " << m_NormalEstimator.getIndices()->size() << std::std::endl;
+
+	SpinImageEstimation<PointXYZRGB, Normal, Histogram<M_HISTGRAM_BINS > > m_SPIN(m_SPINImgWidth, m_SPINAngle, m_SPINMinPts);
+	PointCloud<Histogram<M_HISTGRAM_BINS > >::Ptr spin_images(new PointCloud<Histogram<M_HISTGRAM_BINS > >);
+
+	// Setup spin image computation
+	m_SPIN.setInputCloud(Cloud);
+	m_SPIN.setInputNormals(m_Normals);
+	m_SPIN.setSearchMethod(m_KdTree);
+	m_SPIN.setRadiusSearch(m_SPINRadius);
+	m_SPIN.setIndices(indicesptr);
+
+	// Compute SPIN
+	m_SPIN.compute(*spin_images);
+
+	FileStr.open(m_FeatureFile.c_str(), ios::app); // NOTE: Don't add the ios:trunc flag here!
+	if(FileStr.is_open())
+	{
+		FileStr << "[";
+		for(int k = 0; k < SegmentFeat.size(); ++k)
+		{
+			if(k != SegmentFeat.size() - 1)
+			{
+				FileStr << SegmentFeat.at(k) << " ";
+				continue;
+			}
+					
+			FileStr << SegmentFeat.at(k) << "]" << endl;
+		}
+		for(int i = 0; i < spin_images->points.size(); ++i)
+		{
+			pcl::Histogram<M_HISTGRAM_BINS > feat_line = spin_images->points[i];
+			// Option 1: Avoid printing commas and brackets for Johnny's sake
+			for(int i = 0; i < M_HISTGRAM_BINS; ++i)
+			{
+				if(i == 0)
+					FileStr << "(";
+				if(i == M_HISTGRAM_BINS - 1)
+				{
+					FileStr << feat_line.histogram[i] << ")" << std::endl;
+					continue;
+				}
+
+				FileStr << feat_line.histogram[i] << " ";
+			}
+
+			// Option 2: Write to file using the overloaded << operator
+			// FileStr << feat_line << std::endl;
+		}
+		FileStr.close();
+	}
+	else
+		std::cout << "[WARNING]: Problem writing to file. Please check FeatDescriptor::Compute()" << std::endl;
+
+	return true;
+}
+
 bool FeatDescriptor::ParseConfig(void)
 {
 	// Parse strategy: Tokenize the strings before and after the occurence of an '=' character in each line into keys and values
