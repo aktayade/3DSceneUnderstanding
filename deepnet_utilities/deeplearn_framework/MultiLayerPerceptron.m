@@ -68,8 +68,10 @@ classdef MultiLayerPerceptron < handle
                             obj.layers{l} = LayerBinaryAutoencoder(hiddenLayers(l));
                         end
                     case 'p'
-                        if useRBMs
+                        if l == 1 && useRBMs
                             obj.layers{l} = LayerPoissonRBM(hiddenLayers(l));
+                        elseif useRBMs
+                            obj.layers{l} = LayerBernoulliRBM(hiddenLayers(l));
                         else
                             error('Poisson autoencoder not supported');
                         end

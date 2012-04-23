@@ -9,6 +9,12 @@ function [ ] = stage_model_select_pretrain( taskName, stayActive, target )
 %   useRBMs - true to use RBMs instead of autoencoder networks
 %   modelSelectDensity - [opt] determines how many search values are tried
 %   modelSelectKFolds - [opt] how many folds to use in model selection CV
+%   splitInputSizes - [opt] if inputType is two or more characters then
+%       this array is read containing the lengths in order of the data's
+%       types. Ex: [50 20] for first 50 dimensions are for RBM type 1...
+%   splitHiddenSizes - [opt] if inputType is two or more characters then
+%       this array is read containing the lengths in order fo the hidden
+%       layer divisions. Ex: [20 30] for 20 hidden units for first input
 %   
     global_paths;
     
@@ -55,9 +61,51 @@ function [mlp] = pretrain(xtrain, ytrain, unlabeled, taskName)
     if ~isfield(task, 'useRBMs')
         error('Must define task parameter useRBMs');
     end
+    if length(task.inputType) > 1 && ~isfield(task, 'splitInputSizes')
+        error('If split input is defined, must define splitInputSizes');
+    end
+    if length(task.inputType) > 1 && ~isfield(task, 'splitHiddenSizes')
+        error('If split input is defined, must define splitHiddenSizes');
+    end
 
-    mlp = MultiLayerPerceptron(taskName, task.hiddenLayers, task.numClasses, task.inputType, task.useRBMs, true);
-    
+    if length(task.inputType) == 1
+        mlp = MultiLayerPerceptron(taskName, task.hiddenLayers, task.numClasses, task.inputType, task.useRBMs, true);
+        mlp.allowSaving = false;
+        mlp = pretrain_net(mlp, xtrain, ytrain, unlabeled, task);
+    else
+        assert(sum(task.splitInputSizes) == size(xtrain,1), 'Split hidden layers do not sum to data dimension');
+        assert(sum(task.splitHiddenSizes) == task.hiddenLayers(1), 'Split input size does not sum to given hidden size');
+        assert(length(task.splitInputSizes) == length(task.inputType), 'splitInputSizes and inputType do not match in length');
+        assert(length(task.splitHiddenSizes) == length(task.inputType), 'splitHiddenSizes and inputType do not match in length');
+        newW = [];
+        newB = [];
+        dimStart = 1;
+        for ii = 1:length(task.inputType)
+            mlp_t = MultiLayerPerceptron('temp', task.splitHiddenSizes(ii), task.numClasses, task.inputType(ii), task.useRBMs, true);
+            mlp_t.allowSaving = false;
+            dind = dimStart:(dimStart+task.splitInputSizes(ii)-1);
+            mlp_t = pretrain_net(mlp_t, xtrain(dind,:), ytrain, unlabeled(dind,:), task);
+            W = mlp_t.layers{1}.W;
+            b = mlp_t.layers{1}.b;
+            
+            newW = [newW zeros(size(newW,1), size(W,2));
+                    zeros(size(W, 1), size(newW,2)) W];
+            newB = [newB; b];
+        end
+        
+        newInputLayer = LayerBernoulliRBM(size(newW, 1));
+        newInputLayer.W = newW;
+        newInputLayer.b = newB;
+        newInputLayer.pretrained = true;
+
+        mlp = MultiLayerPerceptron(taskName, task.hiddenLayers, task.numClasses, 'b', task.useRBMs, true);
+        mlp.allowSaving = false;
+        mlp.layers{1} = newInputLayer;
+        mlp = pretrain_net(mlp, xtrain, ytrain, unlabeled, task);
+    end
+end
+
+function [mlp] = pretrain_net(mlp, xtrain, ytrain, unlabeled, task)
     for l = 1:length(mlp.layers)
         if ~mlp.layers{l}.pretrained
             % Model selection:

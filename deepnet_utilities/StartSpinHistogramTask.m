@@ -1,11 +1,15 @@
 global_paths;
 
-load('histogram_un.mat');
+load('data_office_kmeans_unm.mat');
 data = DATA';
 labels = LABEL';
 
-taskName = 'unpoi_unspinhistograms';
-set_task_parameters(taskName, 'hiddenLayers', [400 300 200], 'inputType', 'p', 'useRBMs', true, 'modelSelectDensity', 10, 'modelSelectKFolds', 4);
+% Scale data to be poisson RBM safe
+sf = 100/max(data(:));
+data = data * sf;
+
+taskName = 'office-spinhistograms';
+set_task_parameters(taskName, 'hiddenLayers', [1000 750 500], 'inputType', 'p', 'useRBMs', true, 'modelSelectDensity', 10, 'modelSelectKFolds', 4);
 create_cross_validated_task(taskName, data, labels, 4, [], false);
 
 % stage_model_select_pretrain('', true);
