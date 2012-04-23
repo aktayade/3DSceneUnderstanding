@@ -82,11 +82,11 @@ int main(int argc, char ** argv)
 	FeatSegment * Segmenter = new FeatSegment(std::string(argv[3]));
 	Segmenter->SetSceneCloud(WholeScene);
 	if(isUseISFeatures)
-		Segmenter->BreakIntoSegments(std::string(argv[4]), SceneNumber);
+		isUseISFeatures = Segmenter->BreakIntoSegments(std::string(argv[4]), SceneNumber);
 	else
 		Segmenter->BreakIntoSegments();
 
-	cout << "[OK]: Computing keypoints and features for segment..." << endl;
+	cout << "[INFO]: Computing keypoints and features for segment..." << endl;
 	int NumSegments = Segmenter->GetSegments().size();
 	for(int i = 0; i < NumSegments; ++i)
 	{
@@ -106,7 +106,7 @@ int main(int argc, char ** argv)
 			delete spin;
 		}
 	}
-	cout << "[OK]: Done computing features and keypoints." << endl;
+	cout << "[INFO]: Done computing features and keypoints." << endl;
 	FileStr.close();
 
 	// Visualization stuff

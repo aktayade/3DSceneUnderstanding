@@ -24,7 +24,7 @@ class FeatSegment
 		virtual ~FeatSegment(void);
 		void SetSceneCloud(PointCloud<PointXYZRGBCamSL >::Ptr SceneCloud) { m_SceneCloud = SceneCloud; };
 		void BreakIntoSegments(void);
-		void BreakIntoSegments(const std::string& NodeFeatsFile, const int& SceneNumber);
+		bool BreakIntoSegments(const std::string& NodeFeatsFile, const int& SceneNumber);
 		std::vector<FeatPointCloud * > GetSegments(void) { return m_Segments; };
 		std::vector<int > GetLabels(void) { return m_Labels; };
 		std::vector<std::vector<float > > GetISFeatures(void) { return m_SegISFeatures; };
