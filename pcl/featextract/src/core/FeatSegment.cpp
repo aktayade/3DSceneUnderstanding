@@ -14,7 +14,7 @@ void FeatSegment::BreakIntoSegments(void)
 {
 	if(m_SceneCloud == NULL)
 	{
-		cerr << "[FATAL]: Error. No scene point cloud set. Use SetSceneCloud() to do that." << endl;
+		cout << "[FATAL]: Error. No scene point cloud set. Use SetSceneCloud() to do that." << endl;
 		return;
 	}
 
@@ -52,7 +52,7 @@ bool FeatSegment::BreakIntoSegments(const string& NodeFeatsFile, const int& Scen
 {
 	if(m_SceneCloud == NULL)
 	{
-		cerr << "[FATAL]: Error. No scene point cloud set. Use SetSceneCloud() to do that." << endl;
+		cout << "[FATAL]: Error. No scene point cloud set. Use SetSceneCloud() to do that." << endl;
 		return false;
 	}
 
@@ -60,7 +60,7 @@ bool FeatSegment::BreakIntoSegments(const string& NodeFeatsFile, const int& Scen
 	NodeFeatsFileStr.open(NodeFeatsFile.c_str(), ios::in);
 	if(NodeFeatsFileStr.is_open() == false)
 	{
-		cerr << "[WARNING]: Unable to open node features file. Reverting to just Spin images with no Image + Shape Features." << endl;
+		cout << "[WARNING]: Unable to open node features file. Reverting to just Spin images with no Image + Shape Features." << endl;
 		BreakIntoSegments();
 		return false;
 	}

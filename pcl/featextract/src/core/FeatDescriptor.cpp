@@ -10,7 +10,7 @@ FeatDescriptor::FeatDescriptor(void) :
 
 }
 
-FeatDescriptor::FeatDescriptor(const std::string& FeatureFile, const std::string& ConfigFName) :
+FeatDescriptor::FeatDescriptor(const string& FeatureFile, const string& ConfigFName) :
 	m_KdTree(new pcl::search::KdTree<PointXYZRGB >),
 	m_Normals(new PointCloud<Normal >)
 {
@@ -42,16 +42,16 @@ FeatDescriptor::~FeatDescriptor(void)
 
 }
 
-bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<int > Indices)
+bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, vector<int > Indices)
 {
-	IndicesPtr indicesptr(new std::vector<int> (Indices));
+	IndicesPtr indicesptr(new vector<int> (Indices));
 
 	m_NormalEstimator.setInputCloud(Cloud);
 	m_NormalEstimator.setSearchMethod(m_KdTree);
 
 	m_NormalEstimator.setRadiusSearch(m_NormalEstRadius);
 	m_NormalEstimator.compute(*m_Normals);
-	// std::cout << "Number of indices in normal estimation: " << m_NormalEstimator.getIndices()->size() << std::std::endl;
+	// cout << "Number of indices in normal estimation: " << m_NormalEstimator.getIndices()->size() << endl;
 
 	SpinImageEstimation<PointXYZRGB, Normal, Histogram<M_HISTGRAM_BINS > > m_SPIN(m_SPINImgWidth, m_SPINAngle, m_SPINMinPts);
 	PointCloud<Histogram<M_HISTGRAM_BINS > >::Ptr spin_images(new PointCloud<Histogram<M_HISTGRAM_BINS > >);
@@ -79,7 +79,7 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 					FileStr << "(";
 				if(i == M_HISTGRAM_BINS - 1)
 				{
-					FileStr << feat_line.histogram[i] << ")" << std::endl;
+					FileStr << feat_line.histogram[i] << ")" << endl;
 					continue;
 				}
 
@@ -87,32 +87,32 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 			}
 
 			// Option 2: Write to file using the overloaded << operator
-			// FileStr << feat_line << std::endl;
+			// FileStr << feat_line << endl;
 		}
 		FileStr.close();
 	}
 	else
-		std::cout << "Problem writing to file. Please check FeatDescriptor::Compute()" << std::endl;
+		cout << "[WARNING]: Problem writing to file. Please check FeatDescriptor::Compute()" << endl;
 
 	return true;
 }
 
-bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<int > Indices, std::vector<float > SegmentFeat, const int& SegmentLabel)
+bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, vector<int > Indices, vector<float > SegmentFeat, const int& SegmentLabel)
 {
 	if(SegmentLabel != int(SegmentFeat.at(2))) // Check for label correspondence
 	{
-		std::cerr << "[FATAL]: Spin images not aligned with I+S features! Check logic." << std::endl;
+		cout << "[FATAL]: Spin images not aligned with I+S features! Check logic." << endl;
 		return false;
 	}
 
-	IndicesPtr indicesptr(new std::vector<int> (Indices));
+	IndicesPtr indicesptr(new vector<int> (Indices));
 
 	m_NormalEstimator.setInputCloud(Cloud);
 	m_NormalEstimator.setSearchMethod(m_KdTree);
 
 	m_NormalEstimator.setRadiusSearch(m_NormalEstRadius);
 	m_NormalEstimator.compute(*m_Normals);
-	// std::cout << "Number of indices in normal estimation: " << m_NormalEstimator.getIndices()->size() << std::std::endl;
+	// cout << "Number of indices in normal estimation: " << m_NormalEstimator.getIndices()->size() << endl;
 
 	SpinImageEstimation<PointXYZRGB, Normal, Histogram<M_HISTGRAM_BINS > > m_SPIN(m_SPINImgWidth, m_SPINAngle, m_SPINMinPts);
 	PointCloud<Histogram<M_HISTGRAM_BINS > >::Ptr spin_images(new PointCloud<Histogram<M_HISTGRAM_BINS > >);
@@ -151,7 +151,7 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 					FileStr << "(";
 				if(i == M_HISTGRAM_BINS - 1)
 				{
-					FileStr << feat_line.histogram[i] << ")" << std::endl;
+					FileStr << feat_line.histogram[i] << ")" << endl;
 					continue;
 				}
 
@@ -159,12 +159,12 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 			}
 
 			// Option 2: Write to file using the overloaded << operator
-			// FileStr << feat_line << std::endl;
+			// FileStr << feat_line << endl;
 		}
 		FileStr.close();
 	}
 	else
-		std::cout << "[WARNING]: Problem writing to file. Please check FeatDescriptor::Compute()" << std::endl;
+		cout << "[WARNING]: Problem writing to file. Please check FeatDescriptor::Compute()" << endl;
 
 	return true;
 }
@@ -173,25 +173,25 @@ bool FeatDescriptor::ParseConfig(void)
 {
 	// Parse strategy: Tokenize the strings before and after the occurence of an '=' character in each line into keys and values
 	// Then parse the value of each key
-	std::ifstream ConfigFile;
+	ifstream ConfigFile;
 	ConfigFile.open(m_ConfigFName.c_str());
 	if(ConfigFile.is_open() == false)
 	{
-		std::cerr << "ParseConfig() ERROR: Unable to open config file." << std::endl;
+		cout << "ParseConfig() ERROR: Unable to open config file." << endl;
 		return false;
 	}
 
-	std::vector<std::string > Keys;
-	std::vector<std::string > Values;
-	std::string Line;
+	vector<string > Keys;
+	vector<string > Values;
+	string Line;
 
-	while(std::getline(ConfigFile, Line))
+	while(getline(ConfigFile, Line))
     {
-        std::stringstream str(Line);
-        std::string Key;
-        std::string Value;
+        stringstream str(Line);
+        string Key;
+        string Value;
 
-        if((std::getline(str, Key, '=')) && (str >> Value))
+        if((getline(str, Key, '=')) && (str >> Value))
         {
 			if(strcmp(Key.c_str(), "NormalEstRadius") == 0)
 			{

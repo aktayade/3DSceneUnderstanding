@@ -27,6 +27,18 @@ int ExtractSceneNumber(const string& FileName)
 {
 	// Can handle only scene followed by 1 or 2 numbers
 	string SceneNum = FileName;
+	if(SceneNum.size() < 10)
+	{
+		cout << "[ERROR:] Scene file name not as expected. Check input or contact author." << endl;
+		return -1;
+	}
+		
+	if(SceneNum.size() == 10)
+	{
+		SceneNum.erase(0, 4);
+		SceneNum.erase(1, SceneNum.size()-1);
+		return atoi(SceneNum.c_str());
+	}
 	SceneNum.erase(0, SceneNum.size()-11);
 //	cout << SceneNum << endl;
 	if(SceneNum[0] != 's')
