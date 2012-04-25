@@ -1,6 +1,9 @@
+
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/core)
+
 # To use all *.cpp and *.hpp
-FILE(GLOB ALL_HEADER_FILES *.hpp)
-FILE(GLOB CPP_FILES *.cpp)
+FILE(GLOB ALL_HEADER_FILES core/*.hpp)
+FILE(GLOB CPP_FILES *.cpp core/*.cpp)
 
 SET(SRCS
 	${CPP_FILES}
@@ -10,6 +13,6 @@ SET(SRCS
 SET(extLinkerOption ${PCL_LIBRARIES})
 #SET(extLinkerOption ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
 
-ADD_EXECUTABLE(pcdbin2pcdascii ${SRCS})
-TARGET_LINK_LIBRARIES(pcdbin2pcdascii ${extLinkerOption})
+ADD_EXECUTABLE(visualizepcd ${SRCS})
+TARGET_LINK_LIBRARIES(visualizepcd ${extLinkerOption})
 
