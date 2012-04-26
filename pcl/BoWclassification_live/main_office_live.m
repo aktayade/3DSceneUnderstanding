@@ -4,6 +4,7 @@ tic;
 
 addpath('SpatialPyramid/');
 addpath('libsvm-3.11/matlab/');
+addpath('rbmdiclearn/');
 addpath('DBNclassifier/');
 
 rawdata_name = 'featdata/features_live.pcd.txt';
