@@ -7,7 +7,7 @@ addpath('libsvm-3.11/matlab/');
 addpath('DBNclassifier/');
 
 rawdata_name = 'featdata/features_live.pcd.txt';
-data_dir = 'cache/office_final/';
+data_dir = 'cache_live/office_final/';
 
 %% Set parameters
 seg_size_thres = 10;
