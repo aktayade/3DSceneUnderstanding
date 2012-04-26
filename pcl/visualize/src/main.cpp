@@ -28,7 +28,7 @@ int main (int argc, char** argv)
 	}
 
 	pcl::visualization::PCLVisualizer viewer("Classified Output");
-	viewer.setFullScreen(true);
+//	viewer.setFullScreen(true);
 	pcl::visualization::PointCloudGeometryHandlerXYZ<PointXYZRGBCamSL > geometry(cloud);
 	viewer.addPointCloud(cloud, geometry, "cloud");
 //	viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, "keypoints");

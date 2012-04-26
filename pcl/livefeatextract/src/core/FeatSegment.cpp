@@ -137,21 +137,29 @@ void FeatSegment::segment(const PointCloud<PointXYZRGB >::Ptr cloud,  PointCloud
     extractEuclideanClusters(cloud, CloudNormals, ClustersTree, radius, clusters, angle, min_pts_per_cluster, max_pts_per_cluster);
     fprintf(stderr, "Number of clusters found matching the given constraints: %d.", (int)clusters.size ());
 
-	FileStr.open("live_segments.txt", ios::app); // NOTE: Don't add the ios:trunc flag here!
+	std::ofstream FileStr2;
+	FileStr2.open("live_segments.txt", ios::app); // NOTE: Don't add the ios:trunc flag here!
 	// Copy to clusters to segments
 	for (size_t i = 0; i < clusters.size (); ++i)
 	{
-		if(FileStr.is_open())
+		if(FileStr2.is_open())
 		{
-			FileStr << i << endl;
 			for(int j = 0; j < clusters[i].indices.size(); ++j)
-				FileStr << clusters[i].indices.at(j) << "\t";
-			FileStr << endl;
+			{
+				if(j == clusters[i].indices.size() - 1)
+				{
+					FileStr2 << clusters[i].indices.at(j) << endl;
+					continue; // Also break;
+				}
+				FileStr2 << clusters[i].indices.at(j) << " ";
+			}
 
 			FeatPointCloud * Segment = new FeatPointCloud(m_SceneCloud, clusters[i].indices, m_ConfigFName);
 			m_Segments.push_back(Segment);
 		}
+		else
+			cout << "Failed to open file.\n";
 	}
-	FileStr.close();
+	FileStr2.close();
 }
 

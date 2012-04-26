@@ -15,7 +15,7 @@ FeatPointCloud::FeatPointCloud(const std::string& CloudFile, const std::string& 
 		std::cout << "Successfully loaded " << CloudFile << "." << std::endl;
 }
 
-FeatPointCloud::FeatPointCloud(PointCloud<PointXYZRGBCamSL >::Ptr Cloud, std::vector<int > CopyIndices, const std::string& ConfigFName) :
+FeatPointCloud::FeatPointCloud(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<int > CopyIndices, const std::string& ConfigFName) :
 	m_Cloud(new PointCloud<PointXYZRGB >),
 	m_KeypointDetector(new FeatKeypoint(ConfigFName))
 {

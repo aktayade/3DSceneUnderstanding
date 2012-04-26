@@ -20,13 +20,13 @@ class FeatSegment
 	public:
 		FeatSegment(const std::string& ConfigFName);
 		virtual ~FeatSegment(void);
-		void SetSceneCloud(PointCloud<PointXYZRGBCamSL >::Ptr SceneCloud) { m_SceneCloud = SceneCloud; };
+		void SetSceneCloud(PointCloud<PointXYZRGB >::Ptr SceneCloud) { m_SceneCloud = SceneCloud; };
 		void BreakIntoSegments(void);
 		std::vector<FeatPointCloud * > GetSegments(void) { return m_Segments; };
 
 	private:
 		std::vector<FeatPointCloud * > m_Segments;
-		PointCloud<PointXYZRGBCamSL >::Ptr m_SceneCloud;
+		PointCloud<PointXYZRGB >::Ptr m_SceneCloud;
 		std::string m_ConfigFName;
 
 		void segment(const PointCloud<PointXYZRGB >::Ptr cloud,  PointCloud<PointXYZRGB >::Ptr outcloud);

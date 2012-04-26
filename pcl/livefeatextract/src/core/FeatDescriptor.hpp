@@ -16,7 +16,7 @@ class FeatDescriptor
 		FeatDescriptor(const int FeatType);
 		virtual ~FeatDescriptor(void);
 
-		bool Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<int > Indices);
+		bool Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<int > Indices, const int& SegNum);
 		bool ParseConfig(void);
 
 	private:
