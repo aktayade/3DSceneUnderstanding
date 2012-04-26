@@ -15,7 +15,7 @@ class FeatPointCloud
 	public:
 		FeatPointCloud(void);
 		FeatPointCloud(const std::string& CloudFile, const std::string& ConfigFName);
-		FeatPointCloud(PointCloud<PointXYZRGBCamSL >::Ptr Cloud, std::vector<int > CopyIndices, const std::string& ConfigFName);
+		FeatPointCloud(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<int > CopyIndices, const std::string& ConfigFName);
 		virtual ~FeatPointCloud(void);
 
 		PointCloud<PointXYZRGB >::Ptr GetCloud(void) { return m_Cloud; };

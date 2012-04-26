@@ -13,6 +13,6 @@ SET(SRCS
 SET(extLinkerOption ${PCL_LIBRARIES})
 #SET(extLinkerOption ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
 
-ADD_EXECUTABLE(visualizepcd ${SRCS})
-TARGET_LINK_LIBRARIES(visualizepcd ${extLinkerOption})
+ADD_EXECUTABLE(livevisualize ${SRCS})
+TARGET_LINK_LIBRARIES(livevisualize ${extLinkerOption})
 

@@ -12,44 +12,66 @@ using namespace pcl;
 
 int main(int argc, char ** argv)
 {
-	if(argc != 3)
+	if(argc != 2)
 	{
-		cerr << "Incorrect number of input parameters. Usage: ./livefeatextract <Output Feature File> <Config File>" << endl;
+		cerr << "Incorrect number of input parameters. Usage: ./livefeatextract <Config File>" << endl;
 		return -1;
 	}
 
 	FeatOpenNIGrabber Live;
 	Live.Run();
 
-	return -2; // TEMP only
+	PointCloud<PointXYZRGB >::Ptr SceneSnap(new PointCloud<PointXYZRGB >);
+	SceneSnap = Live.GetCurrentCloud();
+	std::vector<int > indices;
+	pcl::removeNaNFromPointCloud(*SceneSnap, *SceneSnap, indices);
+	cout << "NaNs found at " << indices.size() << " locations." << endl;
 
-	PointCloud<PointXYZRGBCamSL >::Ptr WholeScene(new PointCloud<PointXYZRGBCamSL >);
-	// Load data into a PointXYZRGBCamSL
-	if(pcl::io::loadPCDFile(argv[1], *WholeScene) == -1)
-		std::cerr << "Problem loading from file " << argv[1] << "." << std::endl;
-	else
-		std::cout << "Successfully loaded " << argv[1] << "." << std::endl;
-
-	// Split scene into segments
-	FeatSegment * Segmenter = new FeatSegment(std::string(argv[3]));
-	Segmenter->SetSceneCloud(WholeScene);
+	FeatSegment * Segmenter = new FeatSegment(std::string(argv[1]));
+	Segmenter->SetSceneCloud(SceneSnap);
 	Segmenter->BreakIntoSegments();
 
 	cout << "Computing keypoints and features for segment..." << endl;
 	int NumSegments = Segmenter->GetSegments().size();
+//	FileStr2.open("live_segments.txt", ios::trunc);
+//	FileStr2.close();
+	// Open new file ot just clear the existing file
+	FileStr.open("features_live.pcd.txt", ios::trunc);
+	if(FileStr.is_open())
+		FileStr.close();
+
+	FileStr.open("features_live.pcd.txt", ios::app);
+	FileStr << "#SegmentNumber #SpaceSeparatedSpinImage (153)" << endl;
+
 	for(int i = 0; i < NumSegments; ++i)
 	{
 		Segmenter->GetSegments().at(i)->ComputeKeypoints();
-		cout << i << " has num keypoints as " << Segmenter->GetSegments().at(i)->GetKeypointDetector()->GetKeypoints()->points.size() << endl;
-
-		// Compute features
-		if(Segmenter->GetSegments().at(i)->GetNumKeypoints() > 1) // PARAM - Also depends on SPINMinPts
+		if(Segmenter->GetSegments().at(i)->GetNumKeypoints() > 1)
 		{
-			FeatDescriptor * spin = new FeatDescriptor(std::string(argv[2]), std::string(argv[3]));
-			spin->Compute(Segmenter->GetSegments().at(i)->GetCloud(), Segmenter->GetSegments().at(i)->GetKeypointIndices());
+			FeatDescriptor * spin = new FeatDescriptor(std::string("features_live.pcd.txt"), std::string(argv[1]));
+			spin->Compute(Segmenter->GetSegments().at(i)->GetCloud(), Segmenter->GetSegments().at(i)->GetKeypointIndices(), i);
 			delete spin;
 		}
 	}
+
+	FileStr.close();
+
+	if(true)
+	{
+		pcl::visualization::PCLVisualizer viewer("Segment Cloud Viewer");
+		for(int i = 0; i < 10; ++i)
+		{
+//			pcl::visualization::PointCloudGeometryHandlerXYZ<PointXYZRGB > geometry(Segmenter->GetSegments().at(i)->GetCloud());
+			string seg = boost::lexical_cast<string>(i);
+			viewer.addPointCloud(Segmenter->GetSegments().at(i)->GetCloud(), seg);
+//			viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, string(i));
+			viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 0.0, 0.0, seg);
+		}
+		viewer.spin();
+
+		while(!viewer.wasStopped()) {}
+	}
+
 
 	return 0;
 }

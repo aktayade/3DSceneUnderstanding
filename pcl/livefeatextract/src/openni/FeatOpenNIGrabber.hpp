@@ -5,6 +5,10 @@
 #include <pcl/point_types.h>
 #include <pcl/io/openni_grabber.h>
 #include <pcl/visualization/cloud_viewer.h>
+#include <pcl/filters/filter.h>
+
+#include "extern.hpp"
+
 #ifdef _WIN32
 	#define sleep(x) Sleep((x)*1000)
 #endif
@@ -22,7 +26,7 @@ class FeatOpenNIGrabber
 		pcl::visualization::CloudViewer m_Viewer;
 		PointCloud<PointXYZRGB >::Ptr m_CurrentCloud;
 
-		void ShowCloud(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr& Cloud);
+		void ShowCloud(const PointCloud<PointXYZRGBA >::ConstPtr& Cloud);
 };
 
 #endif /* __FEATOPENNIGRABBER_H__ */

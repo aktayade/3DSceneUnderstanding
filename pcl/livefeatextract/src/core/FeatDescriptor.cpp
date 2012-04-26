@@ -42,7 +42,7 @@ FeatDescriptor::~FeatDescriptor(void)
 
 }
 
-bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<int > Indices)
+bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<int > Indices, const int& SegNum)
 {
 	IndicesPtr indicesptr(new std::vector<int> (Indices));
 
@@ -76,10 +76,10 @@ bool FeatDescriptor::Compute(PointCloud<PointXYZRGB >::Ptr Cloud, std::vector<in
 			for(int i = 0; i < M_HISTGRAM_BINS; ++i)
 			{
 				if(i == 0)
-					FileStr << "(";
+					FileStr << SegNum << " ";
 				if(i == M_HISTGRAM_BINS - 1)
 				{
-					FileStr << feat_line.histogram[i] << ")" << std::endl;
+					FileStr << feat_line.histogram[i] << std::endl;
 					continue;
 				}
 

@@ -24,35 +24,6 @@ void FeatSegment::BreakIntoSegments(void)
 	pcl::copyPointCloud(*m_SceneCloud, *incloud);
 	segment(incloud, outcloud);
 	std::cout << "\nNum segments is: " << m_Segments.size() << "\nEnding test\n";
-
-	int NUMseg;
-	int NUMpts = m_SceneCloud->points.size();
-	NUMseg = m_SceneCloud->points[NUMpts - 1].segment;
-//	std::cout << "Number of segments: " << NUMseg << std::endl;
-	
-	for (int i = 1; i <= NUMseg; ++i)
-	{
-//		std::cout << "Segment number: " << std::setw(4) << i;
-      	std::vector<int > PtIndSeg;
-
-		int tmp;
-      	for(int j = 0; j < m_SceneCloud->points.size (); ++j)
-      	{
-      		if(m_SceneCloud->points[j].segment == i)
-			{
-      			PtIndSeg.push_back(j);
-				tmp = m_SceneCloud->points[j].label;
-			}
-      	}
-		m_Labels.push_back(tmp);
-
-//		if(PtIndSeg.size() <= 1)
-//			std::cout << "Found segment " << i << " with " << PtIndSeg.size() << " points." << std::endl;
-
-//		FeatPointCloud * Segment = new FeatPointCloud(m_SceneCloud, PtIndSeg, m_ConfigFName);
-////		std::cout << "   Size: " << std::setw(5) << Segment->GetCloud()->points.size() << std::endl;
-//		m_Segments.push_back(Segment);
-	}
 }
 
 void extractEuclideanClusters (
@@ -166,11 +137,29 @@ void FeatSegment::segment(const PointCloud<PointXYZRGB >::Ptr cloud,  PointCloud
     extractEuclideanClusters(cloud, CloudNormals, ClustersTree, radius, clusters, angle, min_pts_per_cluster, max_pts_per_cluster);
     fprintf(stderr, "Number of clusters found matching the given constraints: %d.", (int)clusters.size ());
 
+	std::ofstream FileStr2;
+	FileStr2.open("live_segments.txt", ios::app); // NOTE: Don't add the ios:trunc flag here!
 	// Copy to clusters to segments
 	for (size_t i = 0; i < clusters.size (); ++i)
 	{
-		FeatPointCloud * Segment = new FeatPointCloud(m_SceneCloud, clusters[i].indices, m_ConfigFName);
-		m_Segments.push_back(Segment);
+		if(FileStr2.is_open())
+		{
+			for(int j = 0; j < clusters[i].indices.size(); ++j)
+			{
+				if(j == clusters[i].indices.size() - 1)
+				{
+					FileStr2 << clusters[i].indices.at(j) << endl;
+					continue; // Also break;
+				}
+				FileStr2 << clusters[i].indices.at(j) << " ";
+			}
+
+			FeatPointCloud * Segment = new FeatPointCloud(m_SceneCloud, clusters[i].indices, m_ConfigFName);
+			m_Segments.push_back(Segment);
+		}
+		else
+			cout << "Failed to open file.\n";
 	}
+	FileStr2.close();
 }
 

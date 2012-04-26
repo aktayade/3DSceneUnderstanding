@@ -6,8 +6,6 @@
 #include <fstream>
 
 static std::ofstream FileStr;
-static bool isTakeSnapshot = false;
-static bool isTerminate = false;
 
 struct PointXYZRGBCamSL
 {
