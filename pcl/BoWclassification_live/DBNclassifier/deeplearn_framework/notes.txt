@@ -1,0 +1,7 @@
+The mnist data can be found with the ufldl exercises, and is
+included in the ufldl.zip folder, but is not included here.
+
+Data is always DxN (D = number of dimensions, N = number of examples)
+
+Yes, if a method changes itself it needs to be reassigned afterwards UNLESS
+UNLESS it derives from the handle superclass
