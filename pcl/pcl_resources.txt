@@ -1,0 +1,6 @@
+http://www.pcl-users.org/Getting-Keypoint-indices-td3240245.html
+http://www.pointclouds.org/assets/rss2011/05_features.pdf
+http://www.pcl-users.org/IndicesPtr-from-vector-lt-int-gt-td3311424.html
+http://www.pcl-users.org/Downsampled-cloud-indices-td2871237.html
+http://www.pcl-users.org/FPFH-optimising-with-voxel-grid-td3418228.html
+http://pointclouds.org/documentation/tutorials/adding_custom_ptype.php
