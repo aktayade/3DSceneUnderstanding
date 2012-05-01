@@ -18,12 +18,11 @@ void FeatSegment::BreakIntoSegments(void)
 		return;
 	}
 
-	std::cout << "Starting test\n";
 	PointCloud<PointXYZRGB >::Ptr incloud(new PointCloud<PointXYZRGB >);
 	PointCloud<PointXYZRGB >::Ptr outcloud(new PointCloud<PointXYZRGB >);
 	pcl::copyPointCloud(*m_SceneCloud, *incloud);
 	segment(incloud, outcloud);
-	std::cout << "\nNum segments is: " << m_Segments.size() << "\nEnding test\n";
+	std::cout << "\nNum segments is: " << m_Segments.size() << endl;
 }
 
 void extractEuclideanClusters (
@@ -112,7 +111,7 @@ void extractEuclideanClusters (
 void FeatSegment::segment(const PointCloud<PointXYZRGB >::Ptr cloud,  PointCloud<PointXYZRGB >::Ptr outcloud)
 {
 	// PARAM - Lots of them
-	int min_pts_per_cluster = 1;
+	int min_pts_per_cluster = 10;
 	int max_pts_per_cluster = INT_MAX; //3000000;
 	assert(max_pts_per_cluster > 3000000); // Avoid overflow
     int number_neighbours = 50; // PARAM

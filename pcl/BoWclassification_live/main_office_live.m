@@ -7,7 +7,7 @@ addpath('libsvm-3.11/matlab/');
 addpath('rbmdiclearn/');
 addpath('DBNclassifier/');
 
-rawdata_name = 'featdata/features_live.pcd.txt';
+rawdata_name = 'runall/features_live.pcd.txt';
 data_dir = 'cache_live/office_final/';
 
 %% Set parameters
@@ -118,7 +118,7 @@ load(classifier);
 K = [(1:NUMseg)' K];
 [predict_label, accuracy, dec_values] = svmpredict(zeros(NUMseg,1), K, model);
 
-fid = fopen('results/result_live_rbmsvm.txt','w');
+fid = fopen('runall/result_live_rbmsvm.txt','w');
 for INDseg = 1:NUMseg
     fprintf(fid,'%d %d\n',segind(INDseg),predict_label(INDseg));
 end
@@ -126,15 +126,16 @@ fclose(fid);
 
 %% Classify data using DBN
 addpath('DBNclassifier/deeplearn_framework/');
-threshold = 0;
+threshold = 0.5;
 load('OfficeSpinRbm400PRBMClassifier.mat');
 data = DATA_unm' * scaleFactor;
 dbn_labels = mlp.Predict(data, threshold);
 
-fid = fopen('results/result_live_dbn.txt','w');
+fid = fopen('runall/result_live_dbn.txt','w');
 for INDseg = 1:NUMseg
     fprintf(fid,'%d %d\n',segind(INDseg),dbn_labels(INDseg));
 end
 fclose(fid);
 
 fprintf('Classification DONE in %f seconds\n',toc);
+quit;

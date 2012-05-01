@@ -22,10 +22,10 @@ int main(int argc, char ** argv)
 	Live.Run();
 
 	PointCloud<PointXYZRGB >::Ptr SceneSnap(new PointCloud<PointXYZRGB >);
-	SceneSnap = Live.GetCurrentCloud();
+	copyPointCloud<PointXYZRGB, PointXYZRGB >(*Live.GetCurrentCloud(), *SceneSnap);
 	std::vector<int > indices;
-	pcl::removeNaNFromPointCloud(*SceneSnap, *SceneSnap, indices);
-	cout << "NaNs found at " << indices.size() << " locations." << endl;
+	pcl::removeNaNFromPointCloud(*Live.GetCurrentCloud(), *SceneSnap, indices);
+//	cout << "NaNs found at " << indices.size() << " locations." << endl;
 
 	FeatSegment * Segmenter = new FeatSegment(std::string(argv[1]));
 	Segmenter->SetSceneCloud(SceneSnap);
@@ -43,30 +43,27 @@ int main(int argc, char ** argv)
 	FileStr.open("features_live.pcd.txt", ios::app);
 	FileStr << "#SegmentNumber #SpaceSeparatedSpinImage (153)" << endl;
 
-	for(int i = 0; i < NumSegments; ++i)
-	{
-		Segmenter->GetSegments().at(i)->ComputeKeypoints();
-		if(Segmenter->GetSegments().at(i)->GetNumKeypoints() > 1)
-		{
-			FeatDescriptor * spin = new FeatDescriptor(std::string("features_live.pcd.txt"), std::string(argv[1]));
-			spin->Compute(Segmenter->GetSegments().at(i)->GetCloud(), Segmenter->GetSegments().at(i)->GetKeypointIndices(), i);
-			delete spin;
-		}
-	}
+//	for(int i = 0; i < NumSegments; ++i)
+//	{
+//		Segmenter->GetSegments().at(i)->ComputeKeypoints();
+//		if(Segmenter->GetSegments().at(i)->GetNumKeypoints() > 1)
+//		{
+//			FeatDescriptor * spin = new FeatDescriptor(std::string("features_live.pcd.txt"), std::string(argv[1]));
+//			spin->Compute(Segmenter->GetSegments().at(i)->GetCloud(), Segmenter->GetSegments().at(i)->GetKeypointIndices(), i);
+//			delete spin;
+//		}
+//	}
 
 	FileStr.close();
+	sleep(1);
 
+	int SegNum = 100;
 	if(true)
 	{
 		pcl::visualization::PCLVisualizer viewer("Segment Cloud Viewer");
-		for(int i = 0; i < 10; ++i)
-		{
-//			pcl::visualization::PointCloudGeometryHandlerXYZ<PointXYZRGB > geometry(Segmenter->GetSegments().at(i)->GetCloud());
-			string seg = boost::lexical_cast<string>(i);
-			viewer.addPointCloud(Segmenter->GetSegments().at(i)->GetCloud(), seg);
-//			viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, string(i));
-			viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 0.0, 0.0, seg);
-		}
+		viewer.addPointCloud(Segmenter->GetSegments().at(SegNum)->GetCloud(), "cloud");
+//		viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, "keypoints");
+//		viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 0.0, 0.0, "keypoints");
 		viewer.spin();
 
 		while(!viewer.wasStopped()) {}
